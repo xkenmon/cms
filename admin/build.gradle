@@ -1,0 +1,43 @@
+buildscript {
+    ext {
+        springBootVersion = '2.0.4.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'com.xkenmon.cms'
+version = '0.0.1-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    compile project(':dao')
+    compile rootProject.ext.dependencies['spring-boot-starter-aop']
+    compile rootProject.ext.dependencies['spring-boot-starter-cache']
+    compile rootProject.ext.dependencies['spring-boot-starter-freemarker']
+    compile rootProject.ext.dependencies['spring-boot-starter-web']
+    compile rootProject.ext.dependencies['spring-boot-starter-security']
+    compile rootProject.ext.dependencies['mybatis-spring-boot-starter']
+    compile rootProject.ext.dependencies['guava']
+    compile rootProject.ext.dependencies['swagger2']
+    compile rootProject.ext.dependencies['swagger-ui']
+    compile rootProject.ext.dependencies['qiniu']
+    compile rootProject.ext.dependencies['jjwt']
+    optional rootProject.ext.dependencies['spring-boot-devtools']
+    compileOnly rootProject.ext.dependencies['spring-boot-configuration-processor']
+    runtime rootProject.ext.dependencies['mysql-connector-java']
+    testCompile rootProject.ext.dependencies['spring-boot-starter-test']
+}

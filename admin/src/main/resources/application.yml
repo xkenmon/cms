@@ -1,0 +1,24 @@
+server:
+  port: 8080
+  # Enable response compression
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+    min-response-size: 1024
+spring:
+  datasource:
+    driver-class-name: "com.mysql.cj.jdbc.Driver"
+    url: jdbc:mysql://db_server/db_cms_new
+    username: root
+    password: "$%^YGR^&UHGT^&U"
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    use-generated-keys: true
+logging:
+  level:
+    io.swagger.models.parameters.AbstractSerializableParameter: error
+##jwt配置
+auth:
+  jwtSecret: wtfwtfftwesfdsfds
+  jwtExpirationInMs: 300000 #五分钟过期

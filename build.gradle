@@ -1,0 +1,84 @@
+allprojects {
+    group = 'com.xkenmon.cms'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        jcenter()
+        maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+        maven { url "http://repo.maven.apache.org/maven2" }
+    }
+}
+
+ext {
+
+    configuration = [
+            javaVersion = JavaVersion.VERSION_1_8
+    ]
+
+    libraries = [
+            springBootVersion = '2.0.4.RELEASE',
+            mybatisSpringBootStarterVersion = '1.3.2',
+            mybatisPlusVersion = '3.0-RC1',
+            junitVersion = '4.12',
+            mysqlConnectorVersion = '8.0.12',
+            guavaVersion = '26.0-jre',
+            swaggerVersion = '2.9.2',
+            webjarsVersion = '3.1.0',
+            qiniuVersion = "[7.0.0, 7.2.99]",
+            jwtVersion = "0.9.1",
+    ]
+
+    dependencies = [
+            //compile
+            "spring-boot-starter"                : "org.springframework.boot:spring-boot-starter:${springBootVersion}",
+            "spring-boot-configuration-processor": "org.springframework.boot:spring-boot-configuration-processor:${springBootVersion}",
+            "spring-boot-starter-aop"            : "org.springframework.boot:spring-boot-starter-aop:${springBootVersion}",
+            "spring-boot-starter-cache"          : "org.springframework.boot:spring-boot-starter-cache:${springBootVersion}",
+            "spring-boot-starter-freemarker"     : "org.springframework.boot:spring-boot-starter-freemarker:${springBootVersion}",
+            "spring-boot-starter-web"            : "org.springframework.boot:spring-boot-starter-web:${springBootVersion}",
+            "spring-boot-starter-test"           : "org.springframework.boot:spring-boot-starter-test:${springBootVersion}",
+            "spring-boot-starter-security"       : "org.springframework.boot:spring-boot-starter-security:${springBootVersion}",
+            "mybatis-spring-boot-starter"        : "org.mybatis.spring.boot:mybatis-spring-boot-starter:${mybatisSpringBootStarterVersion}",
+            "mybatis-plus-boot-starter"          : "com.baomidou:mybatis-plus-boot-starter:${mybatisPlusVersion}",
+            "guava"                              : "com.google.guava:guava:${guavaVersion}",
+            "swagger2"                           : "io.springfox:springfox-swagger2:${swaggerVersion}",
+            "swagger-ui"                         : "io.springfox:springfox-swagger-ui:${swaggerVersion}",
+            "webjars"                            : "org.webjars:bootstrap:${webjarsVersion}",
+            "qiniu"                              : "com.qiniu:qiniu-java-sdk:${qiniuVersion}",
+            "jjwt"                               : "io.jsonwebtoken:jjwt:${jwtVersion}",
+            //testCompile
+            "junit"                              : "junit:junit:${junitVersion}",
+            //runtime
+            "mysql-connector-java"               : "mysql:mysql-connector-java:${mysqlConnectorVersion}",
+            //option
+            "spring-boot-devtools"               : "org.springframework.boot:spring-boot-devtools:${springBootVersion}"
+    ]
+}
+
+buildscript {
+    repositories {
+        maven { url 'http://repo.spring.io/plugins-release' }
+    }
+    dependencies {
+        classpath 'io.spring.gradle:propdeps-plugin:0.0.9.RELEASE'
+    }
+}
+
+configure(allprojects) {
+    apply plugin: 'propdeps'
+    apply plugin: 'propdeps-maven'
+    apply plugin: 'propdeps-idea'
+    apply plugin: 'propdeps-eclipse'
+}
+
+subprojects {
+
+    apply plugin: 'java'
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    sourceCompatibility = "${javaVersion}"
+    targetCompatibility = "${javaVersion}"
+}
