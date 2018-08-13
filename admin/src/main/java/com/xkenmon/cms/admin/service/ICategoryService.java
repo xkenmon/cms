@@ -28,10 +28,11 @@ public interface ICategoryService {
      * @param pageNumber  页码数
      * @param orderBy     排序依据，小驼峰命名
      * @param order       排序策略，asc|desc
+     * @param siteId      站点ID
      * @return 栏目列表
      * @throws ApiException 交由{@link com.xkenmon.cms.admin.api.ControllerExceptionHandler} 处理的http错误信息
      */
-    IPage<Category> queryCategoryList(Integer rowsPerPage, Integer pageNumber, String orderBy, String order) throws ApiException;
+    IPage<Category> queryCategoryList(Integer rowsPerPage, Integer pageNumber, String orderBy, String order, Integer siteId) throws ApiException;
 
     /**
      * 添加栏目
@@ -60,5 +61,11 @@ public interface ICategoryService {
      */
     Integer deleteCategory(Integer id) throws ApiException;
 
-    List<Tree<Category>> getCategoryTree() throws ApiException;
+    /**
+     * 列出栏目树
+     * @param sid 站点id
+     * @return 栏目树
+     * @throws ApiException 交由{@link com.xkenmon.cms.admin.api.ControllerExceptionHandler} 处理的http错误信息
+     */
+    List<Tree<Category>> getCategoryTree(Integer sid) throws ApiException;
 }

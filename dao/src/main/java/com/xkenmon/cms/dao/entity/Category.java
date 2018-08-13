@@ -1,14 +1,13 @@
 package com.xkenmon.cms.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.time.LocalDateTime;
 import java.io.Serializable;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author AutoGenerator
@@ -167,20 +166,20 @@ public class Category implements Serializable {
     @Override
     public String toString() {
         return "Category{" +
-        ", categoryId=" + categoryId +
-        ", categoryTitle=" + categoryTitle +
-        ", categoryCreateTime=" + categoryCreateTime +
-        ", categoryUpdateTime=" + categoryUpdateTime +
-        ", categoryParentId=" + categoryParentId +
-        ", categoryLevel=" + categoryLevel +
-        ", categorySiteId=" + categorySiteId +
-        ", categoryStatus=" + categoryStatus +
-        ", categoryDesc=" + categoryDesc +
-        ", categoryOrder=" + categoryOrder +
-        ", categorySkin=" + categorySkin +
-        ", categoryType=" + categoryType +
-        ", categoryInHomepage=" + categoryInHomepage +
-        ", categoryHit=" + categoryHit +
-        "}";
+                ", categoryId=" + categoryId +
+                ", categoryTitle=" + categoryTitle +
+                ", categoryCreateTime=" + categoryCreateTime +
+                ", categoryUpdateTime=" + categoryUpdateTime +
+                ", categoryParentId=" + categoryParentId +
+                ", categoryLevel=" + categoryLevel +
+                ", categorySiteId=" + categorySiteId +
+                ", categoryStatus=" + categoryStatus +
+                ", categoryDesc=" + categoryDesc +
+                ", categoryOrder=" + categoryOrder +
+                ", categorySkin=" + categorySkin +
+                ", categoryType=" + categoryType +
+                ", categoryInHomepage=" + categoryInHomepage +
+                ", categoryHit=" + categoryHit +
+                "}";
     }
 }

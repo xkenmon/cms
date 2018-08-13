@@ -4,7 +4,7 @@
 # Log file
 *.log
 
-# BlueJ files
+# BlueJ fileNames
 *.ctxt
 
 # Mobile Tools for Java (J2ME)
@@ -33,7 +33,7 @@ hs_err_pid*
 .idea/**/dictionaries
 .idea/**/shelf
 
-# Sensitive or high-churn files
+# Sensitive or high-churn fileNames
 .idea/**/dataSources/
 .idea/**/dataSources.ids
 .idea/**/dataSources.local.xml
@@ -41,18 +41,20 @@ hs_err_pid*
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
+.idea/dataSources.xml
 
 # Gradle
 .idea/**/gradle.xml
 .idea/**/libraries
 
 # Gradle and Maven with auto-import
-# When using Gradle or Maven with auto-import, you should exclude module files,
+# When using Gradle or Maven with auto-import, you should exclude module fileNames,
 # since they will be recreated, and may cause churn.  Uncomment if using
 # auto-import.
 .idea/modules.xml
 .idea/*.iml
 .idea/modules
+*.iml
 
 # CMake
 cmake-build-*/
@@ -90,7 +92,7 @@ fabric.properties
 # Ignore Gradle GUI config
 gradle-app.setting
 
-# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+# Avoid ignoring Gradle wrapper jar file (.jar fileNames are usually ignored)
 !gradle-wrapper.jar
 
 # Cache of project

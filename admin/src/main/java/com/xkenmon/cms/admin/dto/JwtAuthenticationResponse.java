@@ -1,11 +1,13 @@
 package com.xkenmon.cms.admin.dto;
 
 
+import java.io.Serializable;
+
 /**
  * @author bigmeng
  * @date 2018/8/9
  */
-public class JwtAuthenticationResponse {
+public class JwtAuthenticationResponse implements Serializable {
     private String tokenType = "Bearer";
     private String accessToken;
     private Long expirationInMs;

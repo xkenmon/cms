@@ -1,6 +1,7 @@
 package com.xkenmon.cms.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.xkenmon.cms.admin.dto.ArticleUploadRequest;
 import com.xkenmon.cms.admin.exception.ApiException;
 import com.xkenmon.cms.dao.entity.Article;
 
@@ -24,10 +25,11 @@ public interface IArticleService {
      * @param pageNumber  页码
      * @param orderBy     排序依据,小驼峰，如articleTitle
      * @param order       排序策略，asc|desc
+     * @param sid         站点ID
      * @return 分页信息对应的文章列表
      * @throws ApiException 交由{@link com.xkenmon.cms.admin.api.ControllerExceptionHandler} 处理的http错误信息
      */
-    IPage<Article> queryArticleList(Integer rowsPerPage, Integer pageNumber, String orderBy, String order) throws ApiException;
+    IPage<Article> queryArticleList(Integer rowsPerPage, Integer pageNumber, String orderBy, String order, Integer sid) throws ApiException;
 
 
     /**
@@ -37,7 +39,7 @@ public interface IArticleService {
      * @return 文章ID
      * @throws ApiException 交由{@link com.xkenmon.cms.admin.api.ControllerExceptionHandler} 处理的http错误信息
      */
-    Integer createArticle(Article article) throws ApiException;
+    Integer createArticle(ArticleUploadRequest article) throws ApiException;
 
     /**
      * 根据传来文章的ID更新文章

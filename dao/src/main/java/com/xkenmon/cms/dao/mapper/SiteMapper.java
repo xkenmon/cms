@@ -2,6 +2,7 @@ package com.xkenmon.cms.dao.mapper;
 
 import com.xkenmon.cms.dao.entity.Site;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -13,4 +14,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  */
 public interface SiteMapper extends BaseMapper<Site> {
 
+    @Select("select * from cms_site where site_url = #{url} limit 1")
+    public Site selectByUrl(String url);
 }

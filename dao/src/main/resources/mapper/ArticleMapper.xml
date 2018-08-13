@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xkenmon.cms.dao.mapper.ArticleMapper">
+    <select id="selectAvailable" resultType="Article">
+        SELECT
+        <choose >
+            <when test="ew.sqlSelect == null">
+                *
+            </when>
+            <otherwise>
+                ${ew.sqlSelect}
+            </otherwise>
+        </choose>
+        FROM cms_article WHERE article_status = 1
+        AND ${ew.sqlSegment}
+    </select>
+</mapper>

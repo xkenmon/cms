@@ -1,6 +1,6 @@
 package com.xkenmon.cms.dao.mapper;
 
-import com.xkenmon.cms.dao.entity.Outerchain;
+import com.xkenmon.cms.dao.entity.FriendLink;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 
 /**
@@ -11,6 +11,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author AutoGenerator
  * @since 2018-08-06
  */
-public interface OuterchainMapper extends BaseMapper<Outerchain> {
+public interface FriendLinkMapper extends BaseMapper<FriendLink> {
 
 }

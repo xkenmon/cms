@@ -9,3 +9,5 @@
 
 rootProject.name = 'cms'
 include 'admin', 'web', 'dao'
+include 'common'
+

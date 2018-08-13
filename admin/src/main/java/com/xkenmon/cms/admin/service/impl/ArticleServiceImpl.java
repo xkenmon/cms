@@ -6,98 +6,76 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableList;
+import com.xkenmon.cms.admin.dto.ArticleUploadRequest;
 import com.xkenmon.cms.admin.exception.ApiException;
 import com.xkenmon.cms.admin.service.IArticleService;
+import com.xkenmon.cms.common.constant.TableField;
 import com.xkenmon.cms.dao.entity.Article;
+import com.xkenmon.cms.dao.entity.File;
 import com.xkenmon.cms.dao.mapper.ArticleMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.xkenmon.cms.dao.mapper.FileMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author bigmeng
  */
 @Service
 public class ArticleServiceImpl implements IArticleService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArticleServiceImpl.class);
 
     private final
     ArticleMapper articleMapper;
 
+    private final
+    FileMapper fileMapper;
+
     @Autowired
-    public ArticleServiceImpl(ArticleMapper articleMapper) {
+    public ArticleServiceImpl(ArticleMapper articleMapper, FileMapper fileMapper) {
         this.articleMapper = articleMapper;
+        this.fileMapper = fileMapper;
     }
 
-    private static final ImmutableList<String> DB_FIELD = ImmutableList.of(
-            "article_id",
-            "article_title",
-            "article_type",
-            "article_author",
-            "article_url",
-            "article_order",
-            "article_site_id",
-            "article_category_id",
-            "article_create_time",
-            "article_update_time",
-            "article_thumb",
-            "article_hit",
-            "article_desc",
-            "article_status",
-            "article_content",
-            "article_skin",
-            "article_in_homepage",
-            "article_release_time",
-            "article_release_status"
-    );
-
     @Override
+    @Cacheable("article")
     public Article selectById(Integer id) throws ApiException {
         Article article = articleMapper.selectById(id);
         if (null == article) {
             throw new ApiException(404, "article not found");
         }
-        LOGGER.info("query article - id: {}, title: {}", article.getArticleId(), article.getArticleTitle());
         return article;
     }
 
     @Override
-    public IPage<Article> queryArticleList(Integer rowsPerPage, Integer pageNumber, String orderBy, String order) throws ApiException {
+    @Cacheable("articleList")
+    public IPage<Article> queryArticleList(Integer rowsPerPage, Integer pageNumber, String orderBy, String order, Integer sid) throws ApiException {
         //default asc order
         boolean isDescOrder = "Desc".equalsIgnoreCase(order);
 
         String dbOrderBy = CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, orderBy);
-        if (!DB_FIELD.contains(dbOrderBy)) {
+        if (Stream.of(TableField.ARTICLE_FIELD).noneMatch(dbOrderBy::equals)) {
             throw new ApiException(400, "pagination error, check your orderBy(lowerCamel) param");
         }
 
-        List<String> fieldWithContent = DB_FIELD.stream()
-                .filter(e -> !"article_content".equals(e))
-                .collect(Collectors.toList());
         Wrapper<Article> wrapper = new QueryWrapper<Article>()
-                // mybatis Plus 有问题
-                .select(fieldWithContent.stream()
-                        .map(e -> (e + " AS " + CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, e)))
-                        .collect(Collectors.toList())
-                        .toArray(new String[]{}))
+                .select(TableField.ARTICLE_FIELD_WITHOUT_BLOB)
+                .eq("article_site_id", sid)
                 .orderByDesc(isDescOrder, dbOrderBy)
                 .orderByAsc(!isDescOrder, dbOrderBy);
-
-        LOGGER.info(
-                "query article list - pageNumber: {}, rowsPerPage: {}, orderBy: {}, order: {}",
-                pageNumber, rowsPerPage, orderBy, order
-        );
 
         return articleMapper.selectPage(new Page<>(pageNumber, rowsPerPage), wrapper);
     }
 
     @Override
-    public Integer createArticle(Article article) throws ApiException {
+    @CacheEvict(value = {"article", "articleList"}, allEntries = true)
+    public Integer createArticle(ArticleUploadRequest request) throws ApiException {
+        Article article = request.getArticle();
+        List<String> fileNames = request.getFileNames();
         if (isInvalid(article)) {
             throw new ApiException(400, "some article field not complete");
         }
@@ -105,32 +83,47 @@ public class ArticleServiceImpl implements IArticleService {
             throw new ApiException(500, "insert article failed");
         }
 
-        LOGGER.info("insert article - id: {}, title: {}", article.getArticleId(), article.getArticleTitle());
+        if (article.getArticleCreateTime() == null) {
+            article.setArticleCreateTime(LocalDateTime.now());
+        }
+
+        if (fileNames != null) {
+            fileNames.forEach(name -> {
+                File file = new File();
+                file.setFileArticleId(article.getArticleId());
+                file.setFileKey(name);
+                file.setFileSiteId(article.getArticleSiteId());
+                fileMapper.insert(file);
+            });
+        }
+
         return article.getArticleId();
     }
 
     @Override
+    @CacheEvict(value = {"article", "articleList"}, allEntries = true)
     public Article updateArticle(Article article) throws ApiException {
         if (article.getArticleId() == null || article.getArticleId() <= 0) {
             throw new ApiException(400, "must specify articleId field");
         }
-        if (isInvalid(article)) {
-            throw new ApiException(400, "some article field not complete");
+
+        if (!articleMapper.isExist(article.getArticleId())) {
+            throw new ApiException(400, "article is not exists");
         }
+
         if (articleMapper.updateById(article) == 0) {
             throw new ApiException(500, "update article failed");
         }
-        LOGGER.info("update article - id: {}, title: {}", article.getArticleId(), article.getArticleTitle());
         return article;
     }
 
     @Override
+    @CacheEvict(value = {"article", "articleList"}, allEntries = true)
     public Integer deleteArticle(Integer id) throws ApiException {
         int count = articleMapper.deleteById(id);
         if (count != 1) {
             throw new ApiException(400, "delete failed, article not exist");
         }
-        LOGGER.info("delete article - id: {}", id);
         return count;
     }
 
@@ -141,7 +134,7 @@ public class ArticleServiceImpl implements IArticleService {
         return Strings.isNullOrEmpty(article.getArticleAuthor()) ||
                 Strings.isNullOrEmpty(article.getArticleTitle()) ||
                 Strings.isNullOrEmpty(article.getArticleType()) ||
-                article.getArticleId() == null ||
-                article.getArticleSiteId() <= 0;
+                article.getArticleSiteId() == null ||
+                article.getArticleCategoryId() == null;
     }
 }

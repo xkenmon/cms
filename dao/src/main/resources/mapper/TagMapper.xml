@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.xkenmon.cms.dao.mapper.TagMapper">
-
+    <select id="selectTagsByArticle" resultType="Tag">
+        select *
+        from cms_tag
+        where tag_id in (select tag_id from cms_tag_article where article_id = ${articleId})
+    </select>
 </mapper>

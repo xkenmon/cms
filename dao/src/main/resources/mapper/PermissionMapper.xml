@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.xkenmon.cms.dao.mapper.PermissionMapper">
+    <select id="getByUserId" resultType="Permission">
+        select *
+        from cms_permission
+        where user_id = ${uid}
+    </select>
+
+    <select id="getPermittedSite" resultType="Site">
+        select *
+        from cms_site
+        where site_id in (select site_id from cms_permission where user_id = ${uid})
+    </select>
+
+    <select id="getPermittedModule" resultType="String">
+        select module_name
+        from cms_permission
+        where user_id = ${uid}
+          and site_id = ${sid}
+    </select>
+</mapper>

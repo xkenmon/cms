@@ -1,13 +1,16 @@
 package com.xkenmon.cms.admin.dto;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * @author bigmeng
  * @date 2018/8/9
  */
-public class Tree<T> {
+public class Tree<T> implements Serializable {
+
     private T data;
+
     private List<Tree<T>> child;
 
     public T getData() {

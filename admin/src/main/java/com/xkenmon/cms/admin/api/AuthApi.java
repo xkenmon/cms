@@ -10,6 +10,8 @@ import com.xkenmon.cms.admin.service.IUserService;
 import com.xkenmon.cms.dao.entity.User;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -48,6 +50,8 @@ public class AuthApi {
     private final
     IUserService userService;
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(AuthApi.class);
+
     @Autowired
     public AuthApi(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtTokenProvider tokenProvider, IUserService userService) {
         this.authenticationManager = authenticationManager;
@@ -68,22 +72,24 @@ public class AuthApi {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String jwt = tokenProvider.generateToken(authentication);
+
+        LOGGER.info("user [{}] request jwt - {}", loginRequest.getUsername(), jwt);
         return ApiMessage.success(new JwtAuthenticationResponse(jwt, expirationInMs));
     }
 
     @ApiOperation("用户注册")
     @PostMapping("signUp")
     public ApiMessage signUp(@Valid @RequestBody SignUpRequest signUpRequest) throws ApiException {
-        User user = userService.selectByUserName(signUpRequest.getUsername());
-        if (user != null) {
-            throw new ApiException(400, "user exist!");
-        }
-        user = new User();
+        User user = new User();
         user.setUserName(signUpRequest.getUsername());
         user.setUserPassword(passwordEncoder.encode(signUpRequest.getPassword()));
         user.setUserCreateTime(LocalDateTime.now());
         user.setUserEmail(signUpRequest.getEmail());
-        userService.createUser(user);
+        if (userService.createUser(user) == 0) {
+            return ApiMessage.fail(500, "create user failed!");
+        }
+
+        LOGGER.info("user [{}] sign up! - id: {}", user.getUserName(), user.getUserId());
         return ApiMessage.success(user.getUserId());
     }
 }

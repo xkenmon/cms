@@ -1,15 +1,15 @@
 package com.xkenmon.cms.admin.auth;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.xkenmon.cms.admin.service.IUserService;
+import com.xkenmon.cms.dao.entity.Permission;
 import com.xkenmon.cms.dao.entity.User;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.annotation.Resource;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * @author bigmeng
@@ -36,13 +36,15 @@ public class UserPrincipal implements UserDetails {
 
 //    }
 
-    public UserPrincipal(User user){
-        // TODO: 2018/8/9 权限处理
-        this.authorities = Collections.emptyList();
-        this.email=user.getUserEmail();
-        this.id=user.getUserId();
-        this.password=user.getUserPassword();
-        this.username=user.getUserName();
+    UserPrincipal(User user, Collection<Permission> permissions) {
+        //权限采用`siteId::moduleName`形式表达,不用太细分.
+        this.authorities = permissions.stream()
+                .map(p -> new SimpleGrantedAuthority(p.getSiteId() + "::" + p.getModuleName()))
+                .collect(Collectors.toList());
+        this.email = user.getUserEmail();
+        this.id = user.getUserId();
+        this.password = user.getUserPassword();
+        this.username = user.getUserName();
     }
 
     public Integer getId() {

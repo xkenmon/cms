@@ -127,16 +127,16 @@ public class Site implements Serializable {
     @Override
     public String toString() {
         return "Site{" +
-        ", siteId=" + siteId +
-        ", siteName=" + siteName +
-        ", siteUrl=" + siteUrl +
-        ", siteDesc=" + siteDesc +
-        ", siteCopyright=" + siteCopyright +
-        ", siteSkin=" + siteSkin +
-        ", siteCreateTime=" + siteCreateTime +
-        ", siteStatus=" + siteStatus +
-        ", sitePic=" + sitePic +
-        ", siteHit=" + siteHit +
-        "}";
+                "siteId=" + siteId +
+                ", siteName='" + siteName + '\'' +
+                ", siteUrl='" + siteUrl + '\'' +
+                ", siteDesc='" + siteDesc + '\'' +
+                ", siteCopyright='" + siteCopyright + '\'' +
+                ", siteSkin='" + siteSkin + '\'' +
+                ", siteCreateTime=" + siteCreateTime +
+                ", siteStatus=" + siteStatus +
+                ", sitePic='" + sitePic + '\'' +
+                ", siteHit=" + siteHit +
+                '}';
     }
 }

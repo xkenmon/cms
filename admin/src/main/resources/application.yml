@@ -11,14 +11,16 @@ spring:
     url: jdbc:mysql://db_server/db_cms_new
     username: root
     password: "$%^YGR^&UHGT^&U"
-mybatis:
-  configuration:
-    map-underscore-to-camel-case: true
-    use-generated-keys: true
+  cache:
+    type: redis
+    redis:
+      time-to-live: 5m
+  redis:
+    host: localhost
 logging:
   level:
     io.swagger.models.parameters.AbstractSerializableParameter: error
 ##jwt配置
 auth:
   jwtSecret: wtfwtfftwesfdsfds
-  jwtExpirationInMs: 300000 #五分钟过期
+  jwtExpirationInMs: 259200000

@@ -3,11 +3,12 @@ package com.xkenmon.cms.dao.entity;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author AutoGenerator
@@ -21,12 +22,11 @@ public class Permission implements Serializable {
     @TableId(value = "permission_id", type = IdType.AUTO)
     private Integer permissionId;
 
-    private Integer moduleId;
+    private String moduleName;
 
     private Integer siteId;
 
     private Integer userId;
-
 
     public Integer getPermissionId() {
         return permissionId;
@@ -34,14 +34,6 @@ public class Permission implements Serializable {
 
     public void setPermissionId(Integer permissionId) {
         this.permissionId = permissionId;
-    }
-
-    public Integer getModuleId() {
-        return moduleId;
-    }
-
-    public void setModuleId(Integer moduleId) {
-        this.moduleId = moduleId;
     }
 
     public Integer getSiteId() {
@@ -56,6 +48,14 @@ public class Permission implements Serializable {
         return userId;
     }
 
+    public String getModuleName() {
+        return moduleName;
+    }
+
+    public void setModuleName(String moduleName) {
+        this.moduleName = moduleName;
+    }
+
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
@@ -63,10 +63,10 @@ public class Permission implements Serializable {
     @Override
     public String toString() {
         return "Permission{" +
-        ", permissionId=" + permissionId +
-        ", moduleId=" + moduleId +
-        ", siteId=" + siteId +
-        ", userId=" + userId +
-        "}";
+                "permissionId=" + permissionId +
+                ", moduleName='" + moduleName + '\'' +
+                ", siteId=" + siteId +
+                ", userId=" + userId +
+                '}';
     }
 }

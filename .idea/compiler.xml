@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="admin_main" target="1.8" />
+      <module name="admin_test" target="1.8" />
+      <module name="cms_main" target="1.8" />
+      <module name="cms_test" target="1.8" />
+      <module name="com.xkenmon.cms-model_main" target="1.8" />
+      <module name="com.xkenmon.cms-model_test" target="1.8" />
+      <module name="common_main" target="1.8" />
+      <module name="common_test" target="1.8" />
+      <module name="dao_main" target="1.8" />
+      <module name="dao_test" target="1.8" />
+      <module name="model_main" target="1.8" />
+      <module name="model_test" target="1.8" />
+      <module name="web_main" target="1.8" />
+      <module name="web_test" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

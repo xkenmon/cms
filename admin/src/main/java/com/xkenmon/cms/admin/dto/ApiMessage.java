@@ -1,21 +1,23 @@
 package com.xkenmon.cms.admin.dto;
 
+import java.io.Serializable;
+
 /**
  * @author bigmeng
  * @date 2018/8/7
  */
-public class ApiMessage<T> {
+public class ApiMessage<T> implements Serializable {
     private Integer code;
     private String msg;
     private T data;
 
-    public static final Integer SUCCESS = 200;
+    private static final Integer SUCCESS = 200;
 
-    public ApiMessage(Integer code, String msg) {
+    private ApiMessage(Integer code, String msg) {
         this(code, msg, null);
     }
 
-    public ApiMessage(Integer code, String msg, T data) {
+    private ApiMessage(Integer code, String msg, T data) {
         this.code = code;
         this.msg = msg;
         this.data = data;
@@ -25,8 +27,12 @@ public class ApiMessage<T> {
         return new ApiMessage<>(SUCCESS, "success", data);
     }
 
-    public static ApiMessage fail(Integer code,String msg){
-        return new ApiMessage(code,msg);
+    public static <T> ApiMessage success(Integer code, T data) {
+        return new ApiMessage<>(code, "success", data);
+    }
+
+    public static ApiMessage fail(Integer code, String msg) {
+        return new ApiMessage(code, msg);
     }
 
     public Integer getCode() {

@@ -1,14 +1,13 @@
 package com.xkenmon.cms.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.*;
+
 import java.time.LocalDateTime;
 import java.io.Serializable;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author AutoGenerator
@@ -58,9 +57,6 @@ public class Article implements Serializable {
     private Boolean articleInHomepage;
 
     private LocalDateTime articleReleaseTime;
-
-    private Boolean articleReleaseStatus;
-
 
     public Integer getArticleId() {
         return articleId;
@@ -206,36 +202,27 @@ public class Article implements Serializable {
         this.articleReleaseTime = articleReleaseTime;
     }
 
-    public Boolean getArticleReleaseStatus() {
-        return articleReleaseStatus;
-    }
-
-    public void setArticleReleaseStatus(Boolean articleReleaseStatus) {
-        this.articleReleaseStatus = articleReleaseStatus;
-    }
-
     @Override
     public String toString() {
         return "Article{" +
-        ", articleId=" + articleId +
-        ", articleTitle=" + articleTitle +
-        ", articleType=" + articleType +
-        ", articleAuthor=" + articleAuthor +
-        ", articleUrl=" + articleUrl +
-        ", articleOrder=" + articleOrder +
-        ", articleSiteId=" + articleSiteId +
-        ", articleCategoryId=" + articleCategoryId +
-        ", articleCreateTime=" + articleCreateTime +
-        ", articleUpdateTime=" + articleUpdateTime +
-        ", articleThumb=" + articleThumb +
-        ", articleHit=" + articleHit +
-        ", articleDesc=" + articleDesc +
-        ", articleStatus=" + articleStatus +
-        ", articleContent=" + articleContent +
-        ", articleSkin=" + articleSkin +
-        ", articleInHomepage=" + articleInHomepage +
-        ", articleReleaseTime=" + articleReleaseTime +
-        ", articleReleaseStatus=" + articleReleaseStatus +
-        "}";
+                ", articleId=" + articleId +
+                ", articleTitle=" + articleTitle +
+                ", articleType=" + articleType +
+                ", articleAuthor=" + articleAuthor +
+                ", articleUrl=" + articleUrl +
+                ", articleOrder=" + articleOrder +
+                ", articleSiteId=" + articleSiteId +
+                ", articleCategoryId=" + articleCategoryId +
+                ", articleCreateTime=" + articleCreateTime +
+                ", articleUpdateTime=" + articleUpdateTime +
+                ", articleThumb=" + articleThumb +
+                ", articleHit=" + articleHit +
+                ", articleDesc=" + articleDesc +
+                ", articleStatus=" + articleStatus +
+                ", articleContent=" + articleContent +
+                ", articleSkin=" + articleSkin +
+                ", articleInHomepage=" + articleInHomepage +
+                ", articleReleaseTime=" + articleReleaseTime +
+                "}";
     }
 }

@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+}
+
+group 'com.xkenmon.cms'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile rootProject.ext.dependencies["guava"]
+}

@@ -1,17 +1,16 @@
 package com.xkenmon.cms.admin;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cache.annotation.EnableCaching;
 
 /**
  * @author bigmeng
  */
-@SpringBootApplication(scanBasePackages = {"com.xkenmon.cms"})
-@MapperScan("com.xkenmon.cms.dao.mapper")
+@EnableCaching
+@SpringBootApplication(scanBasePackages = "com.xkenmon.cms")
 public class AdminApplication {
-
-	public static void main(String[] args) {
-		SpringApplication.run(AdminApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AdminApplication.class, args);
+    }
 }
