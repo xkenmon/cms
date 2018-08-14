@@ -78,12 +78,14 @@ public class ArticleApi {
             @ApiResponse(code = 400, message = "Some article fields are not complete"),
     })
     @Auth(siteId = "#uploadRequest.article.articleSiteId", modules = ModuleNames.CONTENT_MANAGE)
-    public Integer createArticle(
+    public ApiMessage createArticle(
             @ApiParam("article中的articleAuthor,articleTitle,articleType,articleCategoryId,articleSiteId为必填字段")
             @RequestBody ArticleUploadRequest uploadRequest) throws ApiException {
-        LOGGER.info("insert article - title: {}"
+        articleService.createArticle(uploadRequest);
+        LOGGER.info("insert article - id: {}, title: {}"
+                , uploadRequest.getArticle().getArticleId()
                 , uploadRequest.getArticle().getArticleTitle());
-        return articleService.createArticle(uploadRequest);
+        return ApiMessage.success(uploadRequest.getArticle().getArticleId());
     }
 
     @Auth(siteId = "#article.articleSiteId", modules = ModuleNames.CONTENT_MANAGE)
@@ -94,9 +96,9 @@ public class ArticleApi {
             @ApiResponse(code = 500, message = "internal error"),
             @ApiResponse(code = 400, message = "article is invalid")
     })
-    public Article updateArticle(@RequestBody Article article) throws ApiException {
+    public ApiMessage updateArticle(@RequestBody Article article) throws ApiException {
         LOGGER.info("update article - id: {}, title: {}", article.getArticleId(), article.getArticleTitle());
-        return articleService.updateArticle(article);
+        return ApiMessage.success(articleService.updateArticle(article));
     }
 
     @Auth(siteId = "@articleServiceImpl.selectById(#id).articleSiteId", modules = ModuleNames.CONTENT_MANAGE)
@@ -106,9 +108,9 @@ public class ArticleApi {
             @ApiResponse(code = 200, message = "success"),
             @ApiResponse(code = 500, message = "internal error"),
     })
-    public Integer deleteArticle(@PathVariable("id") @ApiParam Integer id) throws ApiException {
+    public ApiMessage deleteArticle(@PathVariable("id") @ApiParam Integer id) throws ApiException {
         LOGGER.info("delete article - id: {}", id);
-        return articleService.deleteArticle(id);
+        return ApiMessage.success(articleService.deleteArticle(id));
     }
 
 }

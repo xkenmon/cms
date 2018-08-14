@@ -7,6 +7,12 @@ allprojects {
         maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
         maven { url "http://repo.maven.apache.org/maven2" }
     }
+
+    buildscript {
+        repositories {
+            mavenCentral()
+        }
+    }
 }
 
 ext {

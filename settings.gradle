@@ -8,6 +8,5 @@
  */
 
 rootProject.name = 'cms'
-include 'admin', 'web', 'dao'
-include 'common'
+include 'admin', 'web', 'dao', 'common'
 

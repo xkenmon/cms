@@ -53,7 +53,10 @@ public class AuthApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthApi.class);
 
     @Autowired
-    public AuthApi(AuthenticationManager authenticationManager, PasswordEncoder passwordEncoder, JwtTokenProvider tokenProvider, IUserService userService) {
+    public AuthApi(AuthenticationManager authenticationManager
+            , PasswordEncoder passwordEncoder
+            , JwtTokenProvider tokenProvider
+            , IUserService userService) {
         this.authenticationManager = authenticationManager;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;

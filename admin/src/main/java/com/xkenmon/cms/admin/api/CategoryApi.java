@@ -84,10 +84,10 @@ public class CategoryApi {
             @ApiResponse(code = 400, message = "Some category fields are not complete"),
     })
     @Auth(siteId = "#category.categorySiteId", modules = ModuleNames.CONTENT_MANAGE)
-    public Integer createCategory(@RequestBody Category category) throws ApiException {
+    public ApiMessage createCategory(@RequestBody Category category) throws ApiException {
         categoryService.createCategory(category);
         LOGGER.info("insert category - id: {}, title: {}", category.getCategoryId(), category.getCategoryTitle());
-        return category.getCategoryId();
+        return ApiMessage.success(category.getCategoryId());
     }
 
     @PutMapping
@@ -98,9 +98,9 @@ public class CategoryApi {
             @ApiResponse(code = 400, message = "category is invalid")
     })
     @Auth(siteId = "#category.categorySiteId", modules = ModuleNames.CONTENT_MANAGE)
-    public Category updateCategory(@RequestBody Category category) throws ApiException {
+    public ApiMessage updateCategory(@RequestBody Category category) throws ApiException {
         LOGGER.info("update category - id: {}, title: {}", category.getCategoryId(), category.getCategoryTitle());
-        return categoryService.updateCategory(category);
+        return ApiMessage.success(categoryService.updateCategory(category));
     }
 
     @DeleteMapping("{id}")
@@ -110,9 +110,9 @@ public class CategoryApi {
             @ApiResponse(code = 500, message = "internal error"),
     })
     @Auth(siteId = "@categoryServiceImpl.selectById(#id).categorySiteId", modules = ModuleNames.CONTENT_MANAGE)
-    public Integer deleteCategory(@PathVariable("id") @ApiParam Integer id) throws ApiException {
+    public ApiMessage deleteCategory(@PathVariable("id") @ApiParam Integer id) throws ApiException {
         LOGGER.info("delete category - id: {}", id);
-        return categoryService.deleteCategory(id);
+        return ApiMessage.success(categoryService.deleteCategory(id));
     }
 
     @GetMapping("tree")

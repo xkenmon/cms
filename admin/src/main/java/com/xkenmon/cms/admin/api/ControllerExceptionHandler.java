@@ -70,6 +70,7 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ApiMessage handleMissParamException(HttpServletRequest request, HttpServletResponse resp, MissingServletRequestParameterException e) {
         LOGGER.info("miss request param - ip: {}, message: {}", request.getRemoteHost(), e.getMessage());
+        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         return ApiMessage.fail(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
     }
 

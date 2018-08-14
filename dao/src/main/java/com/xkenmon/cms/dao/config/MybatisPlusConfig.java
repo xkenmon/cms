@@ -10,6 +10,7 @@ import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.type.JdbcType;
 import org.mybatis.spring.annotation.MapperScan;
+import org.mybatis.spring.boot.autoconfigure.SpringBootVFS;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,6 @@ import javax.sql.DataSource;
  * @author bigmeng
  */
 @Configuration
-@MapperScan("com.xkenmon.cms.dao.mapper/*")
 public class MybatisPlusConfig {
     @Bean()
     public GlobalConfig globalConfig() {
@@ -32,7 +32,7 @@ public class MybatisPlusConfig {
     }
 
     @Bean()
-    public MapperScannerConfigurer mapperScannerConfigurer(){
+    public MapperScannerConfigurer mapperScannerConfigurer() {
         MapperScannerConfigurer configurer = new MapperScannerConfigurer();
         configurer.setBasePackage("com.xkenmon.cms.dao.mapper");
         return configurer;
@@ -49,6 +49,8 @@ public class MybatisPlusConfig {
         sqlSessionFactory.setConfiguration(configuration);
         sqlSessionFactory.setMapperLocations(new PathMatchingResourcePatternResolver().getResources("classpath:mapper/*.xml"));
         sqlSessionFactory.setTypeAliasesPackage("com.xkenmon.cms.dao.entity");
+        // 参见https://github.com/mybatis/mybatipse/issues/77,  如果要在命令行中运行jar包需要添加VFS抽象类
+        sqlSessionFactory.setVfs(SpringBootVFS.class);
         PaginationInterceptor pagination = new PaginationInterceptor();
         sqlSessionFactory.setPlugins(new Interceptor[]{
                 // 分页插件
