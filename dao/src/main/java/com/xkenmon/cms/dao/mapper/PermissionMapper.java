@@ -1,9 +1,10 @@
 package com.xkenmon.cms.dao.mapper;
 
-import com.xkenmon.cms.dao.entity.Permission;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.xkenmon.cms.dao.entity.Permission;
 import com.xkenmon.cms.dao.entity.Site;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -15,6 +16,7 @@ import java.util.List;
  * @author AutoGenerator
  * @since 2018-08-06
  */
+@Repository
 public interface PermissionMapper extends BaseMapper<Permission> {
 
     /**

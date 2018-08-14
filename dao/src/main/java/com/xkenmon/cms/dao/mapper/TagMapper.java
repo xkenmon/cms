@@ -1,7 +1,8 @@
 package com.xkenmon.cms.dao.mapper;
 
-import com.xkenmon.cms.dao.entity.Tag;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.xkenmon.cms.dao.entity.Tag;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
  * @author AutoGenerator
  * @since 2018-08-06
  */
+@Repository
 public interface TagMapper extends BaseMapper<Tag> {
     /**
      * 选取指定文章的所有标签

@@ -1,7 +1,8 @@
 package com.xkenmon.cms.dao.mapper;
 
-import com.xkenmon.cms.dao.entity.SurveyPage;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.xkenmon.cms.dao.entity.SurveyPage;
+import org.springframework.stereotype.Repository;
 
 /**
  * <p>
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author AutoGenerator
  * @since 2018-08-06
  */
+@Repository
 public interface SurveyPageMapper extends BaseMapper<SurveyPage> {
 
 }

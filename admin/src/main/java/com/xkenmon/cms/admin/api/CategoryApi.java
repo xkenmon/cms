@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.xkenmon.cms.admin.annotation.Auth;
 import com.xkenmon.cms.admin.constant.ModuleNames;
 import com.xkenmon.cms.admin.dto.ApiMessage;
-import com.xkenmon.cms.admin.dto.Tree;
+import com.xkenmon.cms.common.dto.Tree;
 import com.xkenmon.cms.admin.exception.ApiException;
 import com.xkenmon.cms.admin.service.ICategoryService;
 import com.xkenmon.cms.dao.entity.Category;
@@ -43,7 +43,7 @@ public class CategoryApi {
             @ApiResponse(code = 404, message = "category not found", response = ApiMessage.class),
             @ApiResponse(code = 500, message = "internal error", response = ApiMessage.class)
     })
-    @Auth(siteId = "@categoryServiceImpl.selectById(#id).getCategorySiteId()", modules = ModuleNames.CONTENT_MANAGE)
+    @Auth(siteId = "@categoryServiceImpl.selectById(#id).categorySiteId", modules = ModuleNames.CONTENT_MANAGE)
     public Category getById(@PathVariable("id") @ApiParam Integer id) throws ApiException {
         Category category = categoryService.selectById(id);
         LOGGER.info("query category - id: {}, title: {}", category.getCategoryId(), category.getCategoryTitle());
@@ -83,7 +83,7 @@ public class CategoryApi {
             @ApiResponse(code = 500, message = "internal error"),
             @ApiResponse(code = 400, message = "Some category fields are not complete"),
     })
-    @Auth(siteId = "#category.getCategorySiteId()", modules = ModuleNames.CONTENT_MANAGE)
+    @Auth(siteId = "#category.categorySiteId", modules = ModuleNames.CONTENT_MANAGE)
     public Integer createCategory(@RequestBody Category category) throws ApiException {
         categoryService.createCategory(category);
         LOGGER.info("insert category - id: {}, title: {}", category.getCategoryId(), category.getCategoryTitle());
@@ -97,7 +97,7 @@ public class CategoryApi {
             @ApiResponse(code = 500, message = "internal error"),
             @ApiResponse(code = 400, message = "category is invalid")
     })
-    @Auth(siteId = "#category.getCategorySiteId()", modules = ModuleNames.CONTENT_MANAGE)
+    @Auth(siteId = "#category.categorySiteId", modules = ModuleNames.CONTENT_MANAGE)
     public Category updateCategory(@RequestBody Category category) throws ApiException {
         LOGGER.info("update category - id: {}, title: {}", category.getCategoryId(), category.getCategoryTitle());
         return categoryService.updateCategory(category);
@@ -109,7 +109,7 @@ public class CategoryApi {
             @ApiResponse(code = 200, message = "success"),
             @ApiResponse(code = 500, message = "internal error"),
     })
-    @Auth(siteId = "@categoryServiceImpl.selectById(#id).getCategorySiteId()", modules = ModuleNames.CONTENT_MANAGE)
+    @Auth(siteId = "@categoryServiceImpl.selectById(#id).categorySiteId", modules = ModuleNames.CONTENT_MANAGE)
     public Integer deleteCategory(@PathVariable("id") @ApiParam Integer id) throws ApiException {
         LOGGER.info("delete category - id: {}", id);
         return categoryService.deleteCategory(id);

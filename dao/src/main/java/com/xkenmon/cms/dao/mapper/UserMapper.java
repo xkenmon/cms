@@ -1,9 +1,9 @@
 package com.xkenmon.cms.dao.mapper;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import com.xkenmon.cms.dao.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.xkenmon.cms.dao.entity.User;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 /**
  * <p>
@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Select;
  * @author AutoGenerator
  * @since 2018-08-06
  */
+@Repository
 public interface UserMapper extends BaseMapper<User> {
     /**
      * 根据用户名判断用户是否存在

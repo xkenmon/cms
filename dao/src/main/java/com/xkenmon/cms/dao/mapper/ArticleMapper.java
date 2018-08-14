@@ -1,8 +1,9 @@
 package com.xkenmon.cms.dao.mapper;
 
-import com.xkenmon.cms.dao.entity.Article;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.xkenmon.cms.dao.entity.Article;
 import org.apache.ibatis.annotations.Select;
+import org.springframework.stereotype.Repository;
 
 
 /**
@@ -13,6 +14,7 @@ import org.apache.ibatis.annotations.Select;
  * @author AutoGenerator
  * @since 2018-08-06
  */
+@Repository
 public interface ArticleMapper extends BaseMapper<Article> {
 
     /**

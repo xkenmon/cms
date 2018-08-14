@@ -1,4 +1,4 @@
-package com.xkenmon.cms.admin.dto;
+package com.xkenmon.cms.common.dto;
 
 import java.io.Serializable;
 import java.util.List;

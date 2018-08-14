@@ -1,7 +1,8 @@
 package com.xkenmon.cms.dao.mapper;
 
-import com.xkenmon.cms.dao.entity.Sys;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.xkenmon.cms.dao.entity.Sys;
+import org.springframework.stereotype.Repository;
 
 /**
  * <p>
@@ -11,6 +12,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
  * @author AutoGenerator
  * @since 2018-08-06
  */
+@Repository
 public interface SysMapper extends BaseMapper<Sys> {
 
 }

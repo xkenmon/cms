@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.xkenmon.cms.admin.dto.Tree;
+import com.xkenmon.cms.common.dto.Tree;
 import com.xkenmon.cms.admin.exception.ApiException;
 import com.xkenmon.cms.admin.service.ICategoryService;
 import com.xkenmon.cms.common.constant.TableField;

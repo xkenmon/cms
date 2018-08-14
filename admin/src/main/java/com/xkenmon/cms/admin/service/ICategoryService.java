@@ -1,7 +1,7 @@
 package com.xkenmon.cms.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.xkenmon.cms.admin.dto.Tree;
+import com.xkenmon.cms.common.dto.Tree;
 import com.xkenmon.cms.admin.exception.ApiException;
 import com.xkenmon.cms.dao.entity.Category;
 

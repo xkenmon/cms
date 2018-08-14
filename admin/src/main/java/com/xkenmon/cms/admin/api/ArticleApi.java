@@ -39,7 +39,7 @@ public class ArticleApi {
             @ApiResponse(code = 404, message = "article not found", response = ApiMessage.class),
             @ApiResponse(code = 500, message = "internal error", response = ApiMessage.class),
     })
-    @Auth(siteId = "@articleServiceImpl.selectById(#id).getArticleSiteId()", modules = ModuleNames.CONTENT_MANAGE)
+    @Auth(siteId = "@articleServiceImpl.selectById(#id).articleSiteId", modules = ModuleNames.CONTENT_MANAGE)
     public Article getById(@PathVariable("id") @ApiParam Integer id) throws ApiException {
         LOGGER.info("query article - id: {}", id);
         return articleService.selectById(id);
@@ -77,7 +77,7 @@ public class ArticleApi {
             @ApiResponse(code = 500, message = "internal error"),
             @ApiResponse(code = 400, message = "Some article fields are not complete"),
     })
-    @Auth(siteId = "#uploadRequest.getArticle().getArticleSiteId()", modules = ModuleNames.CONTENT_MANAGE)
+    @Auth(siteId = "#uploadRequest.article.articleSiteId", modules = ModuleNames.CONTENT_MANAGE)
     public Integer createArticle(
             @ApiParam("article中的articleAuthor,articleTitle,articleType,articleCategoryId,articleSiteId为必填字段")
             @RequestBody ArticleUploadRequest uploadRequest) throws ApiException {
@@ -86,7 +86,7 @@ public class ArticleApi {
         return articleService.createArticle(uploadRequest);
     }
 
-    @Auth(siteId = "#article.getArticleSiteId", modules = ModuleNames.CONTENT_MANAGE)
+    @Auth(siteId = "#article.articleSiteId", modules = ModuleNames.CONTENT_MANAGE)
     @PutMapping
     @ApiOperation(value = "update a article", notes = "更新文章，article的ID字段必须指定，返回更新成功后的文章对象")
     @ApiResponses({
@@ -99,7 +99,7 @@ public class ArticleApi {
         return articleService.updateArticle(article);
     }
 
-    @Auth(siteId = "@articleServiceImpl.selectById(#id).getArticleSiteId()", modules = ModuleNames.CONTENT_MANAGE)
+    @Auth(siteId = "@articleServiceImpl.selectById(#id).articleSiteId", modules = ModuleNames.CONTENT_MANAGE)
     @DeleteMapping("{id}")
     @ApiOperation(value = "delete article by id", notes = "删除文章，返回删除的文章数")
     @ApiResponses({

@@ -20,10 +20,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletResponse;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * @author bigmeng
@@ -58,7 +62,7 @@ public class AuthAspect {
             LOGGER.error("can't get siteId, please check your @Auth annotation");
             return null;
         }
-        LOGGER.info("get site id: " + sid);
+        LOGGER.info("auth - user name: {}, site id: {}, moduleNames: {}", userPrincipal.getUsername(), sid, moduleNames);
 
         boolean ok = authorityCollection.stream()
                 .anyMatch(
@@ -68,9 +72,11 @@ public class AuthAspect {
         if (!ok) {
             LOGGER.info("User [{}] attempting to access an unauthorized api has been blocked"
                     , userPrincipal.getUsername());
-            // TODO: 2018/8/13 临时放行
-            return point.proceed();
-//            return null;
+            HttpServletResponse response =
+                    ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                            .getResponse();
+            Objects.requireNonNull(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return null;
         }
 
         return point.proceed();
