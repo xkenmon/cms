@@ -1,6 +1,7 @@
 package com.xkenmon.cms.admin.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.xkenmon.cms.admin.dto.ApiMessage;
 import com.xkenmon.cms.common.dto.Tree;
 import com.xkenmon.cms.admin.exception.ApiException;
 import com.xkenmon.cms.dao.entity.Category;
@@ -68,4 +69,11 @@ public interface ICategoryService {
      * @throws ApiException 交由{@link com.xkenmon.cms.admin.api.ControllerExceptionHandler} 处理的http错误信息
      */
     List<Tree<Category>> getCategoryTree(Integer sid) throws ApiException;
+
+    /**
+     * 统计栏目数量
+     * @param id 站点id
+     * @return 栏目数量
+     */
+    Integer countCategory(Integer id);
 }

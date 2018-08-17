@@ -113,6 +113,12 @@ public class CategoryServiceImpl implements ICategoryService {
         return ImmutableList.of(getTree(root, sid));
     }
 
+    @Override
+    public Integer countCategory(Integer id) {
+        QueryWrapper<Category> wrapper = new QueryWrapper<Category>().eq("categorySiteId",id);
+        return categoryMapper.selectCount(wrapper);
+    }
+
     private Tree<Category> getTree(Category category, Integer sid) {
         QueryWrapper<Category> queryWrapper = new QueryWrapper<Category>()
                 .eq("category_parent_id", category.getCategoryId())

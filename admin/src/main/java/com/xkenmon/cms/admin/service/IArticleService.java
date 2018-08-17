@@ -58,4 +58,11 @@ public interface IArticleService {
      * @throws ApiException 交由{@link com.xkenmon.cms.admin.api.ControllerExceptionHandler} 处理的http错误信息
      */
     Integer deleteArticle(Integer id) throws ApiException;
+
+    /**
+     * 统计文章数量
+     * @param sid 指定站点id
+     * @return 文章数量
+     */
+    Integer countArticle(Integer sid);
 }

@@ -12,8 +12,10 @@ import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -84,10 +86,11 @@ public class CategoryApi {
             @ApiResponse(code = 400, message = "Some category fields are not complete"),
     })
     @Auth(siteId = "#category.categorySiteId", modules = ModuleNames.CONTENT_MANAGE)
-    public ApiMessage createCategory(@RequestBody Category category) throws ApiException {
+    public ResponseEntity<ApiMessage> createCategory(@RequestBody Category category) throws ApiException {
         categoryService.createCategory(category);
         LOGGER.info("insert category - id: {}, title: {}", category.getCategoryId(), category.getCategoryTitle());
-        return ApiMessage.success(category.getCategoryId());
+        return ResponseEntity.created(URI.create("/category/" + category.getCategoryId()))
+                .body(ApiMessage.success(category.getCategoryId()));
     }
 
     @PutMapping
@@ -125,6 +128,14 @@ public class CategoryApi {
     public List<Tree<Category>> categoryTree(@RequestParam Integer siteId) throws ApiException {
         LOGGER.info("query category tree of site: {}", siteId);
         return categoryService.getCategoryTree(siteId);
+    }
+
+    @GetMapping("count/{id}")
+    @ApiOperation("count category by siteId")
+    @Auth(siteId = "#id", modules = ModuleNames.CONTENT_MANAGE)
+    public ApiMessage count(@PathVariable("id") Integer id) {
+        LOGGER.info("count category - id: {}", id);
+        return ApiMessage.success(categoryService.countCategory(id));
     }
 
 }

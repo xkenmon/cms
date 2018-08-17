@@ -3,6 +3,8 @@ package com.xkenmon.cms.admin.aspect;
 import com.xkenmon.cms.admin.ApplicationContextProvider;
 import com.xkenmon.cms.admin.annotation.Auth;
 import com.xkenmon.cms.admin.auth.UserPrincipal;
+import com.xkenmon.cms.admin.dto.ApiMessage;
+import com.xkenmon.cms.admin.exception.ApiException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -14,6 +16,7 @@ import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.ParseException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.core.Authentication;
@@ -50,13 +53,23 @@ public class AuthAspect {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Collection<? extends GrantedAuthority> authorityCollection = authentication.getAuthorities();
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
-
+        HttpServletResponse response =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                        .getResponse();
+        Objects.requireNonNull(response);
         MethodSignature methodSignature = (MethodSignature) point.getSignature();
         Method method = methodSignature.getMethod();
         methodSignature.getParameterNames();
         Auth annotation = method.getAnnotation(Auth.class);
         String el = annotation.siteId();
-        Integer sid = getSiteIdFromSpEl(el, method, point.getArgs());
+        Integer sid;
+        try {
+            sid = getSiteIdFromSpEl(el, method, point.getArgs());
+        } catch (Exception e) {
+            // 一般是service抛出的异常，得到cause后继续抛出给ControllerExceptionHandler处理
+            LOGGER.info("SpEL execute failed - causeBy: {}", e.getCause().getMessage());
+            throw e.getCause();
+        }
         String[] moduleNames = annotation.modules();
         if (sid == null) {
             LOGGER.error("can't get siteId, please check your @Auth annotation");
@@ -72,9 +85,6 @@ public class AuthAspect {
         if (!ok) {
             LOGGER.info("User [{}] attempting to access an unauthorized api has been blocked"
                     , userPrincipal.getUsername());
-            HttpServletResponse response =
-                    ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                            .getResponse();
             Objects.requireNonNull(response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return null;
         }

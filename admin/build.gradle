@@ -31,6 +31,7 @@ dependencies {
     compile rootProject.ext.dependencies['spring-boot-starter-web']
     compile rootProject.ext.dependencies['spring-boot-starter-security']
     compile rootProject.ext.dependencies['spring-boot-starter-data-redis']
+    compile rootProject.ext.dependencies['spring-boot-starter-data-mongodb']
     compile rootProject.ext.dependencies['mybatis-spring-boot-starter']
     compile rootProject.ext.dependencies['guava']
     compile rootProject.ext.dependencies['swagger2']

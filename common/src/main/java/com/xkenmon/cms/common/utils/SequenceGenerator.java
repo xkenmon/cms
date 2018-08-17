@@ -1,4 +1,4 @@
-package com.xkenmon.cms.admin.utils;
+package com.xkenmon.cms.common.utils;
 
 
 import java.net.NetworkInterface;

@@ -1,0 +1,5 @@
+qiniu.bucket=YOUR_BUCKET_NAME
+qiniu.accessKey:YOUR_ACCESS_KEY
+qiniu.secretKey:YOUR_SECRET_KEY
+qiniu.cdnDomain:YOUR_QINIU_CDN
+qiniu.zone:YOUR_ZONE

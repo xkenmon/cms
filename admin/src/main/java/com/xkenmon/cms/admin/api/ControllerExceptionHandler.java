@@ -5,6 +5,8 @@ import com.xkenmon.cms.admin.exception.ApiException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -26,7 +28,7 @@ public class ControllerExceptionHandler {
      * service 抛出的Api异常
      */
     @ExceptionHandler(ApiException.class)
-    public ApiMessage handleApiException(HttpServletRequest request, HttpServletResponse response, ApiException exception) {
+    public ResponseEntity<ApiMessage> handleApiException(HttpServletRequest request, ApiException exception) {
         LOGGER.info("IP: {}\tMETHOD: {}, URI: {}, QUERY: {}\tCODE: {}, MSG: {}",
                 request.getRemoteHost(),
                 request.getMethod(),
@@ -34,68 +36,68 @@ public class ControllerExceptionHandler {
                 request.getQueryString(),
                 exception.getCode(),
                 exception.getMessage());
-        response.setStatus(exception.getCode());
-        return ApiMessage.fail(exception.getCode(), exception.getMessage());
+        return ResponseEntity.status(exception.getCode())
+                .body(ApiMessage.fail(exception.getCode(), exception.getMessage()));
     }
 
     /**
      * HTTP方法访问错误
      */
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ApiMessage handleMethodNotSupportException(
+    public ResponseEntity<ApiMessage> handleMethodNotSupportException(
             HttpServletRequest request,
-            HttpServletResponse response,
             HttpRequestMethodNotSupportedException exception) {
         LOGGER.info("IP: {}\tMETHOD: {}, URI: {}, QUERY: {}\tCODE: {}, MSG: {}",
                 request.getRemoteHost(),
                 request.getMethod(),
                 request.getRequestURI(),
                 request.getQueryString(),
-                HttpServletResponse.SC_METHOD_NOT_ALLOWED,
+                HttpStatus.METHOD_NOT_ALLOWED,
                 exception.getMessage());
-        response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
-        return ApiMessage.fail(HttpServletResponse.SC_METHOD_NOT_ALLOWED, exception.getMessage());
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+                .body(ApiMessage.fail(HttpServletResponse.SC_METHOD_NOT_ALLOWED, exception.getMessage()));
     }
 
     /**
      * 凭据错误
      */
     @ExceptionHandler(BadCredentialsException.class)
-    public ApiMessage handleBadCredentialsException(HttpServletRequest request, HttpServletResponse resp) {
+    public ResponseEntity handleBadCredentialsException(HttpServletRequest request, HttpServletResponse resp) {
         LOGGER.info("用户密码错误 - ip: {}", request.getRemoteHost());
-        resp.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        return ApiMessage.fail(HttpServletResponse.SC_UNAUTHORIZED, "凭据错误, BadCredentialsException");
+        resp.setStatus(HttpStatus.UNAUTHORIZED.value());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiMessage.fail(HttpStatus.UNAUTHORIZED, "凭据错误, BadCredentialsException"));
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
-    public ApiMessage handleMissParamException(HttpServletRequest request, HttpServletResponse resp, MissingServletRequestParameterException e) {
+    public ResponseEntity<ApiMessage> handleMissParamException(HttpServletRequest request, MissingServletRequestParameterException e) {
         LOGGER.info("miss request param - ip: {}, message: {}", request.getRemoteHost(), e.getMessage());
-        resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        return ApiMessage.fail(HttpServletResponse.SC_BAD_REQUEST, e.getMessage());
+        return ResponseEntity.badRequest().body(ApiMessage.fail(HttpServletResponse.SC_BAD_REQUEST, e.getMessage()));
     }
 
     /**
      * 输入数据违反数据完整性
      */
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ApiMessage handleDataIntegrityViolationException(HttpServletResponse resp, DataIntegrityViolationException e) {
+    public ResponseEntity<ApiMessage> handleDataIntegrityViolationException(HttpServletResponse resp, DataIntegrityViolationException e) {
         LOGGER.info("用户输入非法，DataIntegrityViolationException - {}", e.getMessage());
         resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        return ApiMessage.fail(400, "data integrity violation, check constraint fields");
+        return ResponseEntity.badRequest()
+                .body(ApiMessage.fail(400, "data integrity violation, check constraint fields"));
     }
 
     /**
      * 全局异常捕获
      */
     @ExceptionHandler(Exception.class)
-    public ApiMessage handleGlobalException(HttpServletRequest request, HttpServletResponse response, Exception exception) {
+    public ResponseEntity handleGlobalException(HttpServletRequest request, Exception exception) {
         LOGGER.error("IP: {}\tMETHOD: {}, URI: {}, QUERY: {}\tMSG: ",
                 request.getRemoteHost(),
                 request.getMethod(),
                 request.getRequestURI(),
                 request.getQueryString(),
                 exception.fillInStackTrace());
-        response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        return ApiMessage.fail(500, exception.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiMessage.fail(500, exception.getMessage()));
     }
 }

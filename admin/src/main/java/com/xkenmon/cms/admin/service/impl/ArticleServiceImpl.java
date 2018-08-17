@@ -127,6 +127,12 @@ public class ArticleServiceImpl implements IArticleService {
         return count;
     }
 
+    @Override
+    public Integer countArticle(Integer sid) {
+        QueryWrapper<Article> wrapper = new QueryWrapper<Article>().eq("articleSiteId", sid);
+        return articleMapper.selectCount(wrapper);
+    }
+
     /**
      * 判断文章是否非法
      */

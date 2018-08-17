@@ -17,10 +17,16 @@ spring:
       time-to-live: 5m
   redis:
     host: localhost
-logging:
-  level:
-    io.swagger.models.parameters.AbstractSerializableParameter: error
+  data:
+    mongodb:
+      database: logging
+      host: localhost
+#logging:
+#  level:
+#    io.swagger.models.parameters.AbstractSerializableParameter: error
 ##jwt配置
 auth:
   jwtSecret: wtfwtfftwesfdsfds
   jwtExpirationInMs: 259200000
+logging:
+  config: classpath:logback-spring.xml

@@ -1,5 +1,7 @@
 package com.xkenmon.cms.admin.dto;
 
+import org.springframework.http.HttpStatus;
+
 import java.io.Serializable;
 
 /**
@@ -31,8 +33,16 @@ public class ApiMessage<T> implements Serializable {
         return new ApiMessage<>(code, "success", data);
     }
 
+    public static <T> ApiMessage success(HttpStatus code, T data) {
+        return new ApiMessage<>(code.value(), "success", data);
+    }
+
     public static ApiMessage fail(Integer code, String msg) {
         return new ApiMessage(code, msg);
+    }
+
+    public static ApiMessage fail(HttpStatus code, String msg) {
+        return new ApiMessage(code.value(), msg);
     }
 
     public Integer getCode() {

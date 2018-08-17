@@ -12,7 +12,10 @@ import io.swagger.annotations.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
 
 /**
  * @author bigmeng
@@ -73,19 +76,20 @@ public class ArticleApi {
     @PostMapping
     @ApiOperation(value = "create new article", notes = "添加一篇新文章，会进行必要字段完整性检查，添加成功后返回新添加文章的ID")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "success"),
+            @ApiResponse(code = 201, message = "success"),
             @ApiResponse(code = 500, message = "internal error"),
             @ApiResponse(code = 400, message = "Some article fields are not complete"),
     })
     @Auth(siteId = "#uploadRequest.article.articleSiteId", modules = ModuleNames.CONTENT_MANAGE)
-    public ApiMessage createArticle(
+    public ResponseEntity<ApiMessage> createArticle(
             @ApiParam("article中的articleAuthor,articleTitle,articleType,articleCategoryId,articleSiteId为必填字段")
             @RequestBody ArticleUploadRequest uploadRequest) throws ApiException {
         articleService.createArticle(uploadRequest);
         LOGGER.info("insert article - id: {}, title: {}"
                 , uploadRequest.getArticle().getArticleId()
                 , uploadRequest.getArticle().getArticleTitle());
-        return ApiMessage.success(uploadRequest.getArticle().getArticleId());
+        return ResponseEntity.created(URI.create("/article/" + uploadRequest.getArticle().getArticleCategoryId()))
+                .body(ApiMessage.success(201, uploadRequest.getArticle().getArticleId()));
     }
 
     @Auth(siteId = "#article.articleSiteId", modules = ModuleNames.CONTENT_MANAGE)
@@ -111,6 +115,14 @@ public class ArticleApi {
     public ApiMessage deleteArticle(@PathVariable("id") @ApiParam Integer id) throws ApiException {
         LOGGER.info("delete article - id: {}", id);
         return ApiMessage.success(articleService.deleteArticle(id));
+    }
+
+    @GetMapping("count/{id}")
+    @ApiOperation("count article by siteId")
+    @Auth(siteId = "#id", modules = ModuleNames.CONTENT_MANAGE)
+    public ApiMessage count(@PathVariable("id") Integer id) {
+        LOGGER.info("count article - id: {}", id);
+        return ApiMessage.success(articleService.countArticle(id));
     }
 
 }

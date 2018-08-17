@@ -1,7 +1,10 @@
 package com.xkenmon.cms.admin.api;
 
 import com.xkenmon.cms.admin.annotation.Auth;
+import com.xkenmon.cms.admin.log.LogRepository;
 import com.xkenmon.cms.admin.service.IUserService;
+import com.xkenmon.cms.admin.log.MongoAdminLog;
+import com.xkenmon.cms.common.utils.SequenceGenerator;
 import com.xkenmon.cms.dao.mapper.FileMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 /**
+ * ***此API仅做测试用***
+ *
  * @author bigmeng
  * @date 2018/8/12
  */
@@ -21,12 +26,15 @@ import java.util.List;
 public class TestApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestApi.class);
 
+    private final LogRepository logRepository;
+
     private final
     IUserService userService;
 
     private final FileMapper fileMapper;
 
-    public TestApi(IUserService userService, FileMapper fileMapper) {
+    public TestApi(LogRepository logRepository, IUserService userService, FileMapper fileMapper) {
+        this.logRepository = logRepository;
         this.userService = userService;
         this.fileMapper = fileMapper;
     }
@@ -43,5 +51,15 @@ public class TestApi {
         userService.queryModules(1, 56).forEach(LOGGER::info);
         userService.querySite(1).forEach(s -> LOGGER.info(s.toString()));
         return sid;
+    }
+
+    @GetMapping("mongo_test")
+    public void mongoTest() {
+        MongoAdminLog log = new MongoAdminLog();
+        log.setMsg("wtfasfdsfasdf");
+        log.setLevel("Info");
+        log.setTimestamp(System.currentTimeMillis());
+        log.setId(SequenceGenerator.nextId());
+        logRepository.insert(log);
     }
 }
