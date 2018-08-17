@@ -2,10 +2,10 @@ package com.xkenmon.cms.dao.generator;
 
 import com.baomidou.mybatisplus.annotation.DbType;
 import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
-import org.junit.Test;
+//import org.junit.Test;
 
 public class GenerateUtilTest {
-    @Test
+//    @Test
     public void generateTest() {
         DataSourceConfig config = new DataSourceConfig();
         config.setDbType(DbType.MYSQL);

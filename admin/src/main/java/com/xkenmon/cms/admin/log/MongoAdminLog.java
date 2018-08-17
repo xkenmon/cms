@@ -12,6 +12,8 @@ public class MongoAdminLog {
 
     private Long timestamp;
 
+    private Long timeCost;
+
     private String ip;
 
     private String user;
@@ -84,5 +86,13 @@ public class MongoAdminLog {
 
     public void setMethod(String method) {
         this.method = method;
+    }
+
+    public Long getTimeCost() {
+        return timeCost;
+    }
+
+    public void setTimeCost(Long timeCost) {
+        this.timeCost = timeCost;
     }
 }

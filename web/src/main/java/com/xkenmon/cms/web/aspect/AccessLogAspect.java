@@ -34,12 +34,8 @@ public class AccessLogAspect {
 
     private static final ThreadLocal<Long> TIME_COUNT = new ThreadLocal<>();
 
-    private final
-    LogMapper logMapper;
-
     @Autowired
-    public AccessLogAspect(LogMapper logMapper) {
-        this.logMapper = logMapper;
+    public AccessLogAspect() {
     }
 
     @Pointcut("@annotation(com.xkenmon.cms.web.annotation.AccessLogger)")
@@ -54,36 +50,6 @@ public class AccessLogAspect {
     @After("loggerService()")
     public void doAfterAdvice() {
         Long time = Calendar.getInstance().getTimeInMillis() - TIME_COUNT.get();
-        //获取RequestAttributes
-        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
-        //从获取RequestAttributes中获取HttpServletRequest的信息
-        HttpServletRequest request = (HttpServletRequest) requestAttributes
-                .resolveReference(RequestAttributes.REFERENCE_REQUEST);
-        String path = request.getRequestURI();
-        String ip = getIpAddress(request);
-
-        Map<String, Object> map = new HashMap<>();
-        Map<String, String[]> paramMap = request.getParameterMap();
-        map.put("path", path);
-        map.put("ip", ip);
-        map.put("param", paramMap);
-//        map.put("addr", IPUtil.getAddr(ip));
-        map.put("time", time);
-
-        Log logEntry = new Log();
-        logEntry.setLogTime(LocalDateTime.now());
-        // TODO: 2018/8/12 const field
-        logEntry.setLogType("access");
-        logEntry.setLogLevel("info");
-        try {
-            logEntry.setLogInfo(new ObjectMapper().writeValueAsString(map));
-            logger.info(logEntry.getLogInfo());
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-            logger.info(e.getMessage());
-        }
-
-        logMapper.insert(logEntry);
     }
 
 
