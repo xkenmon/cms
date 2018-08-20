@@ -10,4 +10,5 @@ repositories {
 
 dependencies {
     compile rootProject.ext.dependencies["guava"]
+    compile rootProject.ext.dependencies["spring-boot-starter-data-mongodb"]
 }

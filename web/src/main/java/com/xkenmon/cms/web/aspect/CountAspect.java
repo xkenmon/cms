@@ -1,63 +1,94 @@
 package com.xkenmon.cms.web.aspect;
 
+import com.xkenmon.cms.common.log.WebStatisticLog;
+import com.xkenmon.cms.common.log.WebStatisticLogRepository;
+import com.xkenmon.cms.common.utils.SequenceGenerator;
+import com.xkenmon.cms.web.ApplicationContextProvider;
 import com.xkenmon.cms.web.annotation.AccessCount;
-import com.xkenmon.cms.web.annotation.CountParam;
-import com.xkenmon.cms.web.service.CountScheduleService;
+import com.xkenmon.cms.web.util.IpUtil;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.MethodParameter;
+import org.springframework.context.expression.BeanFactoryResolver;
+import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 /**
  * 对{@link AccessCount}进行横切，统计数据
+ *
  * @author bigmeng
  */
 @Component
 @Aspect
 public class CountAspect {
-    private final
-    CountScheduleService countScheduleService;
 
-    private static final Logger logger = LoggerFactory.getLogger(CountAspect.class);
+    private final WebStatisticLogRepository logRepository;
+
+    private static final DefaultParameterNameDiscoverer NAME_DISCOVERER = new DefaultParameterNameDiscoverer();
 
     @Autowired
-    public CountAspect(CountScheduleService countScheduleService) {
-        this.countScheduleService = countScheduleService;
+    public CountAspect(WebStatisticLogRepository logRepository) {
+        this.logRepository = logRepository;
     }
 
     @Pointcut("@annotation(com.xkenmon.cms.web.annotation.AccessCount)")
     public void countPoint() {
     }
 
-    @After("countPoint()")
-    public void count(JoinPoint point) {
+    @AfterReturning(value = "countPoint()", returning = "ret")
+    public void count(JoinPoint point, Objects ret) {
+        // 获取横切的方法
         MethodSignature methodSignature = (MethodSignature) point.getSignature();
         Method method = methodSignature.getMethod();
-        AccessCount annotation = method.getDeclaredAnnotation(AccessCount.class);
-        String type = annotation.value().toString();
-        int paramCount = method.getParameterCount();
-        boolean hasCountParam = false;
-        Object[] args = point.getArgs();
-        for (int i = 0; i < paramCount; i++) {
-            //Spring框架中的一个Helper类
-            MethodParameter parameter = new MethodParameter(method, i);
-            if (parameter.hasParameterAnnotation(CountParam.class)) {
-                String id = String.valueOf(args[i]);
-                countScheduleService.addPV(type, id);
-                hasCountParam = true;
-                break;
+
+        // 获取请求体
+        HttpServletRequest request =
+                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                        .getRequest();
+        Objects.requireNonNull(request);
+
+        // 拿到方法上的注解
+        AccessCount accessCount = method.getAnnotation(AccessCount.class);
+
+        // 解析SpEL表达式
+        ExpressionParser parser = new SpelExpressionParser();
+        StandardEvaluationContext context = new StandardEvaluationContext();
+        String[] paramNames = NAME_DISCOVERER.getParameterNames(method);
+        // 设置beanResolver，可以在SpEL中使用`@`来调用bean
+        context.setBeanResolver(new BeanFactoryResolver(ApplicationContextProvider.getApplicationContext()));
+        if (paramNames != null) {
+            for (int i = 0; i < paramNames.length; i++) {
+                context.setVariable(paramNames[i], point.getArgs()[i]);
             }
         }
-        if (!hasCountParam) {
-            logger.error("@AccessCount 注解的方法中,参数必须有一个有 @CountParam 注解，否则无法进行统计; 方法信息:{}", method);
-        }
+        context.setVariable("ret", ret);
+        Expression expression = parser.parseExpression(accessCount.contentId());
+        Integer contentId = expression.getValue(Integer.class);
+        expression = parser.parseExpression(accessCount.siteId());
+        Integer siteId = expression.getValue(Integer.class);
+
+        //写入日志
+        WebStatisticLog log = new WebStatisticLog();
+        log.setId(SequenceGenerator.nextId());
+        log.setIp(IpUtil.getRealIP(request));
+        log.setTimestamp(System.currentTimeMillis());
+        log.setContentId(contentId);
+        log.setSid(siteId);
+        log.setType(accessCount.countType().toString());
+
+        logRepository.insert(log);
     }
 }

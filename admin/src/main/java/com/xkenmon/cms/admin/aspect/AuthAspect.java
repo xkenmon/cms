@@ -3,8 +3,6 @@ package com.xkenmon.cms.admin.aspect;
 import com.xkenmon.cms.admin.ApplicationContextProvider;
 import com.xkenmon.cms.admin.annotation.Auth;
 import com.xkenmon.cms.admin.auth.UserPrincipal;
-import com.xkenmon.cms.admin.dto.ApiMessage;
-import com.xkenmon.cms.admin.exception.ApiException;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -16,7 +14,6 @@ import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.ParseException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.core.Authentication;
@@ -49,27 +46,35 @@ public class AuthAspect {
 
     @Around("authPointCut()")
     public Object doBeforeAdvice(ProceedingJoinPoint point) throws Throwable {
-        // 用户权限列表
+        // 获取用户权限列表
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Collection<? extends GrantedAuthority> authorityCollection = authentication.getAuthorities();
+
+        // 获取用户
         UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+
+        // 获取请求体
         HttpServletResponse response =
                 ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
                         .getResponse();
         Objects.requireNonNull(response);
+
         MethodSignature methodSignature = (MethodSignature) point.getSignature();
         Method method = methodSignature.getMethod();
-        methodSignature.getParameterNames();
+
         Auth annotation = method.getAnnotation(Auth.class);
         String el = annotation.siteId();
         Integer sid;
         try {
+            long start = System.currentTimeMillis();
             sid = getSiteIdFromSpEl(el, method, point.getArgs());
+            LOGGER.debug("execute SpEL cost {} ms", System.currentTimeMillis() - start);
         } catch (Exception e) {
             // 一般是service抛出的异常，得到cause后继续抛出给ControllerExceptionHandler处理
-            LOGGER.info("SpEL execute failed - causeBy: {}", e.getCause().getMessage());
+            LOGGER.debug("SpEL execute failed - causeBy: {}", e.getCause().getMessage());
             throw e.getCause();
         }
+
         String[] moduleNames = annotation.modules();
         if (sid == null) {
             LOGGER.error("can't get siteId, please check your @Auth annotation");
@@ -77,6 +82,7 @@ public class AuthAspect {
         }
         LOGGER.info("auth - user name: {}, site id: {}, moduleNames: {}", userPrincipal.getUsername(), sid, moduleNames);
 
+        // 判断是否有权限
         boolean ok = authorityCollection.stream()
                 .anyMatch(
                         auth -> Arrays.stream(moduleNames)
@@ -94,8 +100,9 @@ public class AuthAspect {
 
     private Integer getSiteIdFromSpEl(String el, Method method, Object[] args) {
         ExpressionParser parser = new SpelExpressionParser();
-        // TODO: 2018/8/13 Context 的创建消耗资源较大，能不能重用?
+        long start = System.currentTimeMillis();
         StandardEvaluationContext context = new StandardEvaluationContext();
+        LOGGER.debug("create context cost {} ms", System.currentTimeMillis() - start);
         String[] paramNames = NAME_DISCOVERER.getParameterNames(method);
         if (paramNames == null) {
             return null;
@@ -105,7 +112,9 @@ public class AuthAspect {
         for (int i = 0; i < paramNames.length; i++) {
             context.setVariable(paramNames[i], args[i]);
         }
+        long startParse = System.currentTimeMillis();
         Expression expression = parser.parseExpression(el);
+        LOGGER.debug("parse expr cost {} ms", System.currentTimeMillis() - startParse);
         return expression.getValue(context, Integer.class);
     }
 }

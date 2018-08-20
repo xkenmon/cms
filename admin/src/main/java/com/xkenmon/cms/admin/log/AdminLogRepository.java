@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
  * @date 2018/8/16
  */
 @Repository
-public interface LogRepository extends MongoRepository<MongoAdminLog, Long> {
+public interface AdminLogRepository extends MongoRepository<MongoAdminLog, Long> {
 }

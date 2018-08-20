@@ -1,9 +1,9 @@
 package com.xkenmon.cms.web.aspect;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.xkenmon.cms.dao.entity.Log;
-import com.xkenmon.cms.dao.mapper.LogMapper;
+import com.xkenmon.cms.common.log.WebAccessLog;
+import com.xkenmon.cms.common.utils.SequenceGenerator;
+import com.xkenmon.cms.common.log.WebAccessLogRepository;
+import com.xkenmon.cms.web.util.IpUtil;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -12,14 +12,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * 该类负责对{@link com.xkenmon.cms.web.annotation.AccessLogger}横切，记录访问日志
@@ -30,12 +26,15 @@ import java.util.Map;
 @Aspect
 public class AccessLogAspect {
 
+    private final WebAccessLogRepository logRepository;
+
     private final Logger logger = LoggerFactory.getLogger("Access log");
 
     private static final ThreadLocal<Long> TIME_COUNT = new ThreadLocal<>();
 
     @Autowired
-    public AccessLogAspect() {
+    public AccessLogAspect(WebAccessLogRepository logRepository) {
+        this.logRepository = logRepository;
     }
 
     @Pointcut("@annotation(com.xkenmon.cms.web.annotation.AccessLogger)")
@@ -44,38 +43,24 @@ public class AccessLogAspect {
 
     @Before("loggerService()")
     public void doBeforeAdvice() {
-        TIME_COUNT.set(Calendar.getInstance().getTimeInMillis());
+        TIME_COUNT.set(System.currentTimeMillis());
     }
 
     @After("loggerService()")
     public void doAfterAdvice() {
-        Long time = Calendar.getInstance().getTimeInMillis() - TIME_COUNT.get();
-    }
+        Long now = System.currentTimeMillis();
 
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
+                .getRequest();
 
-    /**
-     * 获取真实IP地址
-     *
-     * @param request 请求对象
-     * @return 字符串形式的IP地址
-     */
-    private static String getIpAddress(HttpServletRequest request) {
-        String ip = request.getHeader("x-forwarded-for");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
+        WebAccessLog log = new WebAccessLog();
+        log.setId(SequenceGenerator.nextId());
+        log.setIp(IpUtil.getRealIP(request));
+        log.setTimeCost(now - TIME_COUNT.get());
+        log.setUrl(request.getRequestURL().toString());
+        log.setTimestamp(now);
+
+        logger.info("access url: {}", request.getRequestURL().toString());
+        logRepository.insert(log);
     }
 }

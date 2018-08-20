@@ -1,7 +1,7 @@
 package com.xkenmon.cms.admin.api;
 
 import com.xkenmon.cms.admin.annotation.Auth;
-import com.xkenmon.cms.admin.log.LogRepository;
+import com.xkenmon.cms.admin.log.AdminLogRepository;
 import com.xkenmon.cms.admin.service.IUserService;
 import com.xkenmon.cms.admin.log.MongoAdminLog;
 import com.xkenmon.cms.common.utils.SequenceGenerator;
@@ -26,15 +26,15 @@ import java.util.List;
 public class TestApi {
     private static final Logger LOGGER = LoggerFactory.getLogger(TestApi.class);
 
-    private final LogRepository logRepository;
+    private final AdminLogRepository adminLogRepository;
 
     private final
     IUserService userService;
 
     private final FileMapper fileMapper;
 
-    public TestApi(LogRepository logRepository, IUserService userService, FileMapper fileMapper) {
-        this.logRepository = logRepository;
+    public TestApi(AdminLogRepository adminLogRepository, IUserService userService, FileMapper fileMapper) {
+        this.adminLogRepository = adminLogRepository;
         this.userService = userService;
         this.fileMapper = fileMapper;
     }
@@ -60,6 +60,6 @@ public class TestApi {
         log.setLevel("Info");
         log.setTimestamp(System.currentTimeMillis());
         log.setId(SequenceGenerator.nextId());
-        logRepository.insert(log);
+        adminLogRepository.insert(log);
     }
 }

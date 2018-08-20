@@ -1,7 +1,7 @@
 package com.xkenmon.cms.admin.aspect;
 
 import com.xkenmon.cms.admin.auth.UserPrincipal;
-import com.xkenmon.cms.admin.log.LogRepository;
+import com.xkenmon.cms.admin.log.AdminLogRepository;
 import com.xkenmon.cms.admin.log.MongoAdminLog;
 import com.xkenmon.cms.common.constant.CmsLog;
 import com.xkenmon.cms.common.utils.SequenceGenerator;
@@ -22,12 +22,12 @@ import javax.servlet.http.HttpServletRequest;
 @Aspect
 @Component
 public class AccessAspect {
-    private final LogRepository logRepository;
+    private final AdminLogRepository adminLogRepository;
 
     private static final ThreadLocal<Long> TIME_COUNT = new ThreadLocal<>();
 
-    public AccessAspect(LogRepository logRepository) {
-        this.logRepository = logRepository;
+    public AccessAspect(AdminLogRepository adminLogRepository) {
+        this.adminLogRepository = adminLogRepository;
     }
 
     @Pointcut(
@@ -67,7 +67,7 @@ public class AccessAspect {
         mongoLog.setMethod(request.getMethod());
         mongoLog.setMsg(point.getTarget().toString());
 
-        logRepository.insert(mongoLog);
+        adminLogRepository.insert(mongoLog);
         TIME_COUNT.remove();
     }
 
@@ -97,7 +97,7 @@ public class AccessAspect {
         mongoLog.setMsg(request.getMethod());
         mongoLog.setMsg(e.getMessage());
 
-        logRepository.insert(mongoLog);
+        adminLogRepository.insert(mongoLog);
         TIME_COUNT.remove();
     }
 }

@@ -3,17 +3,17 @@ package com.xkenmon.cms.web.controller;
 import com.xkenmon.cms.dao.entity.Site;
 import com.xkenmon.cms.web.annotation.AccessCount;
 import com.xkenmon.cms.web.annotation.AccessLogger;
-import com.xkenmon.cms.web.annotation.CountParam;
 import com.xkenmon.cms.web.annotation.CountType;
 import com.xkenmon.cms.web.dto.ModelResult;
 import com.xkenmon.cms.web.service.SiteWebService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 /**
  * @author bigmeng
@@ -30,19 +30,22 @@ public class SiteController {
     }
 
 
-    @AccessCount(CountType.SITE)
+    @AccessCount(countType = CountType.SITE,
+            contentId = "#ret.model.get('site').siteId",
+            siteId = "#ret.model.get('site').siteId")
     @AccessLogger
     @RequestMapping("/{siteUrl}")
-    public String show(@CountParam @PathVariable("siteUrl") String siteUrl, Model model) {
+    public ModelAndView show(@PathVariable("siteUrl") String siteUrl, ModelAndView model) {
 
         ModelResult result = webService.getSiteModel(siteUrl);
 
         if (result == null) {
-            return "/error/404";
+            model.setStatus(HttpStatus.NOT_FOUND);
+            return model;
         }
 
         //Add result to module
-        model.addAttribute("result", result);
+        model.addAllObjects(result.getMap());
 
         Site site = (Site) result.get("site");
 
@@ -51,11 +54,14 @@ public class SiteController {
             logger.error("{} skin name is null", site.getSiteName());
         }
 
-        model.addAttribute("BaseSkinPath", site.getSiteSkin().split("/")[0]);
+        model.addObject("BaseSkinPath", site.getSiteSkin().split("/")[0]);
 
         webService.addSiteHit(site);
+
         //Return to the site's skin view, for example : default-site
-        return site.getSiteSkin();
+        model.setViewName(site.getSiteSkin());
+
+        return model;
     }
 
     /**
@@ -63,7 +69,6 @@ public class SiteController {
      *
      * @return redirect
      */
-
     @RequestMapping("/")
     public String index() {
         return "redirect:/index";

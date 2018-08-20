@@ -18,6 +18,7 @@ dependencies {
     compile rootProject.ext.dependencies['spring-boot-starter-web']
     compile rootProject.ext.dependencies['spring-boot-starter-aop']
     compile rootProject.ext.dependencies['spring-boot-starter-data-redis']
+    compile rootProject.ext.dependencies['spring-boot-starter-data-mongodb']
     compile rootProject.ext.dependencies["spring-boot-starter-freemarker"]
     compile rootProject.ext.dependencies['spring-boot-starter-cache']
     optional rootProject.ext.dependencies['spring-boot-devtools']
