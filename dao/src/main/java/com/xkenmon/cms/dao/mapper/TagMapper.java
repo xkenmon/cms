@@ -2,6 +2,7 @@ package com.xkenmon.cms.dao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.xkenmon.cms.dao.entity.Tag;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,5 +23,5 @@ public interface TagMapper extends BaseMapper<Tag> {
      * @param articleId 文章ID
      * @return 该文章对应的Tag列表
      */
-    List<Tag> selectTagsByArticleId(Integer articleId);
+    List<Tag> selectTagsByArticleId(@Param("articleId") Integer articleId);
 }

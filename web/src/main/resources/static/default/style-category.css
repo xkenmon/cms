@@ -1,0 +1,33 @@
+.a-list {
+  display: flex;
+  display: -webkit-flex;
+  flex-flow: column wrap;
+  align-content: flex-start;
+  height: 900px;
+  flex: 8;
+}
+.a-show {
+  margin: 5px;
+  padding: 5px;
+  display: flex;
+  flex-flow: column;
+  background: #ffec9c;
+  text-decoration: none;
+  color: #000;
+  max-width: 200px;
+  min-width: 150px;
+  min-height: 200px;
+}
+.a-show .a-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.a-show .a-desc {
+  font-style: italic;
+  font-size: small;
+}
+.a-show:hover {
+  background-color: #fff6cf;
+}
+/*# sourceMappingURL=style-category.css.map */

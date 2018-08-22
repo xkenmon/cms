@@ -54,7 +54,7 @@ public class SiteController {
             logger.error("{} skin name is null", site.getSiteName());
         }
 
-        model.addObject("BaseSkinPath", site.getSiteSkin().split("/")[0]);
+        model.addObject("baseSkinPath", site.getSiteSkin().split("/")[0]);
 
         webService.addSiteHit(site);
 

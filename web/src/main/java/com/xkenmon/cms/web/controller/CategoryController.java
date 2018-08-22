@@ -22,6 +22,7 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/view/category/")
 public class CategoryController {
     private final CategoryWebService webService;
+
     private static final Logger logger = LoggerFactory.getLogger(CategoryController.class);
 
     @Autowired
@@ -29,7 +30,7 @@ public class CategoryController {
         this.webService = webService;
     }
 
-    @AccessCount(countType = CountType.CATEGORY,contentId = "#id",siteId = "#ret.model.get('category').categorySiteId")
+    @AccessCount(countType = CountType.CATEGORY, contentId = "#id", siteId = "#ret.model.get('category').categorySiteId")
     @AccessLogger
     @RequestMapping("{id}")
     public ModelAndView show(@PathVariable("id") Integer id, ModelAndView model) {
@@ -49,8 +50,6 @@ public class CategoryController {
         if (category.getCategorySkin() == null) {
             logger.error("{} skin name is null", category.getCategoryTitle());
         }
-
-        model.addObject("BaseSkinPath", category.getCategorySkin().split("/")[0]);
 
         webService.addCategoryHit(category);
         //Return to the site's skin view, for example : default-category

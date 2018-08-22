@@ -5,8 +5,8 @@ import com.baomidou.mybatisplus.generator.config.DataSourceConfig;
 //import org.junit.Test;
 
 public class GenerateUtilTest {
-//    @Test
-    public void generateTest() {
+    //    @Test
+    public static void main(String[] args) {
         DataSourceConfig config = new DataSourceConfig();
         config.setDbType(DbType.MYSQL);
         config.setDriverName("com.mysql.cj.jdbc.Driver");

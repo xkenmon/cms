@@ -11,6 +11,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 import org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author bigmeng
  */
@@ -54,7 +57,7 @@ public class FreemarkerConfig implements WebMvcConfigurer {
         resolver.setPrefix("");
         resolver.setSuffix(".ftl");
         resolver.setContentType("text/html; charset=UTF-8");
-        resolver.setRequestContextAttribute("request");
+        resolver.setRequestContextAttribute("ctx");
         return resolver;
     }
 

@@ -9,6 +9,7 @@ import com.xkenmon.cms.dao.mapper.*;
 import com.xkenmon.cms.web.dto.ModelResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -36,8 +37,8 @@ public class ArticleWebService {
 
     private final TagMapper tagMapper;
 
-
-//    private CmsCache<Integer, ModelResult> articleModelCache = new LRUCache<>(128);
+    @Value("${qiniu.cdnDomain}")
+    private String cdnDomain;
 
     public ArticleWebService(SiteMapper siteMapper
             , ArticleMapper articleMapper
@@ -82,18 +83,17 @@ public class ArticleWebService {
                 .put("article", article)
                 .put("fileKeys", fileKeys)
                 .put("tagList", tagList)
-                .put("site", site);
+                .put("site", site)
+                .put("cdnDomain", cdnDomain)
+                .put("baseSkinPath", article.getArticleSkin().split("/")[0]);
 
         return result;
     }
 
     public void addArticleHit(Article article) {
-        //hit add
-        if (article.getArticleHit() == null) {
-            article.setArticleHit(0);
-        }
-
-        article.setArticleHit(article.getArticleHit() + 1);
-        articleMapper.updateById(article);
+        Article update = new Article();
+        update.setArticleId(article.getArticleId());
+        update.setArticleHit(article.getArticleHit() == null ? 1 : article.getArticleHit() + 1);
+        articleMapper.updateById(update);
     }
 }

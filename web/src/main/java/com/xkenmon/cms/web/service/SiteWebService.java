@@ -1,6 +1,7 @@
 package com.xkenmon.cms.web.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.xkenmon.cms.common.constant.AccessStatus;
 import com.xkenmon.cms.common.constant.CMSContentType;
 import com.xkenmon.cms.dao.entity.Article;
@@ -12,6 +13,7 @@ import com.xkenmon.cms.dao.mapper.SiteMapper;
 import com.xkenmon.cms.web.dto.ModelResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -35,6 +37,9 @@ public class SiteWebService {
 
     private final
     CategoryMapper categoryMapper;
+
+    @Value("${qiniu.cdnDomain}")
+    private String cdnDomain;
 
     public SiteWebService(SiteMapper siteMapper
             , ArticleMapper articleMapper
@@ -77,11 +82,13 @@ public class SiteWebService {
         QueryWrapper<Article> articleQueryWrapper = new QueryWrapper<Article>().allEq(articleEqualMap);
         List<Article> indexArticleList = articleMapper.selectList(articleQueryWrapper);
 
-        //The default template needs the data
+        //The default templates needs the data
         result
                 .put("site", site)
                 .put("indexCategoryList", indexCategoryList)
-                .put("indexArticleList", indexArticleList);
+                .put("indexArticleList", indexArticleList)
+                .put("cdnDomain", cdnDomain)
+                .put("baseSkinPath", site.getSiteSkin().split("/")[0]);
 
         //---------------------------------------custom properties start----------------------------------------------//
 
@@ -118,10 +125,9 @@ public class SiteWebService {
     }
 
     public void addSiteHit(Site site) {
-        if (site.getSiteHit() == null) {
-            site.setSiteHit(0);
-        }
-        site.setSiteHit(site.getSiteHit() + 1);
-        siteMapper.updateById(site);
+        Site update = new Site();
+        update.setSiteId(site.getSiteId());
+        update.setSiteHit(site.getSiteHit() == null ? 1 : site.getSiteHit() + 1);
+        siteMapper.updateById(update);
     }
 }

@@ -1,0 +1,13 @@
+.article-title {
+    text-align: center;
+}
+
+.tag {
+    text-align: center;
+    font-size: 15px;
+    /*align-content: center;*/
+}
+
+.a-desc {
+    font-style: italic;
+}

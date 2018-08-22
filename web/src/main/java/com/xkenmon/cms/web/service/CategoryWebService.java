@@ -10,6 +10,7 @@ import com.xkenmon.cms.dao.mapper.SiteMapper;
 import com.xkenmon.cms.web.dto.ModelResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -31,13 +32,16 @@ public class CategoryWebService {
     private final
     CategoryMapper categoryMapper;
 
+    @Value("${qiniu.cdnDomain}")
+    private String cdnDomain;
+
     public CategoryWebService(SiteMapper siteMapper, ArticleMapper articleMapper, CategoryMapper categoryMapper) {
         this.siteMapper = siteMapper;
         this.articleMapper = articleMapper;
         this.categoryMapper = categoryMapper;
     }
 
-    @Cacheable(value = "categoryModel", key = "#id",sync = true)
+    @Cacheable(value = "categoryModel", key = "#id", sync = true)
     public ModelResult getCategoryModel(Integer id) {
         ModelResult result = new ModelResult();
 
@@ -49,31 +53,22 @@ public class CategoryWebService {
 
         Site site = siteMapper.selectById(category.getCategorySiteId());
 
-        //Get 0 level categorise in this site (displayed above the homepage of the website)
-//        CategoryExample categoryExample = new CategoryExample();
-//        categoryExample.or().andCategorySiteIdEqualTo(category.getCategorySiteId()).andCategoryLevelEqualTo(0);
-//        List<Category> categoryList = categoryMapper.selectByExample(categoryExample);
-//        //Each level 0 category into category tree
-//        List<CategoryTree> categoryTreeList = categoryList.stream().map(this::toTree).collect(Collectors.toList());
-
-        // Get this category's article list (without BLOBs)
         QueryWrapper<Article> queryWrapper = new QueryWrapper<Article>().eq("article_category_id", category.getCategoryId());
         List<Article> articleList = articleMapper.selectList(queryWrapper);
 
         result.put("articleList", articleList)
                 .put("category", category)
-                .put("site", site);
+                .put("site", site)
+                .put("cdnDomain", cdnDomain)
+                .put("baseSkinPath", category.getCategorySkin().split("/")[0]);
         return result;
     }
 
     public void addCategoryHit(Category category) {
-        Integer hit = category.getCategoryHit();
-        if (hit == null) {
-            category.setCategoryHit(0);
-            hit = 0;
-        }
-        category.setCategoryHit(hit + 1);
-        categoryMapper.updateById(category);
+        Category update = new Category();
+        update.setCategoryId(category.getCategoryId());
+        update.setCategoryHit(category.getCategoryHit() == null ? 1 : category.getCategoryHit() + 1);
+        categoryMapper.updateById(update);
     }
 
 //    CategoryTree toTree(Category category) {

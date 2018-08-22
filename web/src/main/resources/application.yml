@@ -17,3 +17,5 @@ spring:
       time-to-live: 5m
   redis:
     host: localhost
+qiniu:
+  cdnDomain: http://cdn.cms.xkenmon.cn

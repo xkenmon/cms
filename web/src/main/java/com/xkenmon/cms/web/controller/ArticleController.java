@@ -52,8 +52,6 @@ public class ArticleController {
             return model;
         }
 
-        model.addObject("BaseSkinPath", article.getArticleSkin().split("/")[0]);
-
         webService.addArticleHit(article);
 
         model.setViewName(article.getArticleSkin());

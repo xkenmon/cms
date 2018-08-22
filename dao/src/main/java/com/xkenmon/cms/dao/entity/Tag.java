@@ -24,6 +24,8 @@ public class Tag implements Serializable {
 
     private String tagName;
 
+    private Integer tegSiteId;
+
     private LocalDateTime tagCreateTime;
 
 
@@ -51,12 +53,21 @@ public class Tag implements Serializable {
         this.tagCreateTime = tagCreateTime;
     }
 
+    public Integer getTegSiteId() {
+        return tegSiteId;
+    }
+
+    public void setTegSiteId(Integer tegSiteId) {
+        this.tegSiteId = tegSiteId;
+    }
+
     @Override
     public String toString() {
         return "Tag{" +
-        ", tagId=" + tagId +
-        ", tagName=" + tagName +
-        ", tagCreateTime=" + tagCreateTime +
-        "}";
+                "tagId=" + tagId +
+                ", tagName='" + tagName + '\'' +
+                ", tegSiteId=" + tegSiteId +
+                ", tagCreateTime=" + tagCreateTime +
+                '}';
     }
 }
