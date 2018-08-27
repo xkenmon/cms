@@ -48,6 +48,14 @@ ${article.articleContent}
     <br>
     </#list>
 </#if>
-
+<hr>
+<@cms_article_list size=5 page=1 orderBy="article_create_time" order="desc">
+    <#if result.size gt 0>
+        <h5>最近更新：</h5>
+        <#list result.records as a>
+            <a href="/view/article/${a.articleId}">${a.articleTitle}</a>
+        </#list>
+    </#if>
+</@cms_article_list>
 </body>
 </html>

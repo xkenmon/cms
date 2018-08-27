@@ -88,13 +88,7 @@ public class ArticleServiceImpl implements IArticleService {
         }
 
         if (fileNames != null) {
-            fileNames.forEach(name -> {
-                File file = new File();
-                file.setFileArticleId(article.getArticleId());
-                file.setFileKey(name);
-                file.setFileSiteId(article.getArticleSiteId());
-                fileMapper.insert(file);
-            });
+            fileNames.forEach(name -> saveFile(article, name));
         }
 
         return article.getArticleId();
@@ -102,7 +96,8 @@ public class ArticleServiceImpl implements IArticleService {
 
     @Override
     @CacheEvict(value = {"article", "articleList"}, allEntries = true)
-    public Article updateArticle(Article article) throws ApiException {
+    public Article updateArticle(ArticleUploadRequest request) throws ApiException {
+        Article article = request.getArticle();
         if (article.getArticleId() == null || article.getArticleId() <= 0) {
             throw new ApiException(400, "must specify articleId field");
         }
@@ -111,10 +106,25 @@ public class ArticleServiceImpl implements IArticleService {
             throw new ApiException(400, "article is not exists");
         }
 
+        article.setArticleUpdateTime(LocalDateTime.now());
+
         if (articleMapper.updateById(article) == 0) {
             throw new ApiException(500, "update article failed");
         }
+
+        if (request.getFileNames() != null) {
+            request.getFileNames().forEach(name -> saveFile(article, name));
+        }
+
         return article;
+    }
+
+    private void saveFile(Article article, String name) {
+        File file = new File();
+        file.setFileArticleId(article.getArticleId());
+        file.setFileKey(name);
+        file.setFileSiteId(article.getArticleSiteId());
+        fileMapper.insert(file);
     }
 
     @Override

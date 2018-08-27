@@ -1,26 +1,26 @@
 package com.xkenmon.cms.web.directive;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xkenmon.cms.common.constant.TableField;
 import com.xkenmon.cms.dao.entity.Article;
 import com.xkenmon.cms.dao.mapper.ArticleMapper;
+import com.xkenmon.cms.web.annotation.CmsDirective;
 import com.xkenmon.cms.web.directive.util.DirectiveUtil;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**
  * @author bigmeng
  */
-@Component
+@CmsDirective("cms_content_list")
 public class ContentListDirective implements TemplateDirectiveModel {
 
     /**
@@ -57,6 +57,8 @@ public class ContentListDirective implements TemplateDirectiveModel {
 
     private final ArticleMapper articleMapper;
 
+    private static final DefaultObjectWrapper wrapper = new DefaultObjectWrapperBuilder(Configuration.getVersion()).build();
+
     @Autowired
     public ContentListDirective(ArticleMapper articleMapper) {
         this.articleMapper = articleMapper;
@@ -68,43 +70,22 @@ public class ContentListDirective implements TemplateDirectiveModel {
     @Override
     public void execute(Environment env
             , Map params, TemplateModel[] loopVars
-            , TemplateDirectiveBody body) throws TemplateException {
-        Integer categoryId = DirectiveUtil.getInteger(PARAM_CID, params);
-        Integer size = DirectiveUtil.getInteger(PARAM_SIZE, params);
-        Integer page = DirectiveUtil.getInteger(PARAM_PAGE, params);
-        String orderBy = DirectiveUtil.getString(PARAM_ORDER_BY, params);
-        String order = DirectiveUtil.getString(PARAM_ORDER, params);
-
-        if (categoryId == null) {
-            throw new TemplateException("Must specify " + PARAM_CID + "param.", env);
-        }
-
-        if (orderBy == null) {
-            orderBy = DEFAULT_ORDER_BY;
-        }
-
-        if (page == null) {
-            page = 1;
-        }
-
-        if (size == null) {
-            size = 0;
-        }
+            , TemplateDirectiveBody body) throws TemplateException, IOException {
+        Integer categoryId = DirectiveUtil.getInteger(PARAM_CID, params).orElseThrow(() -> new TemplateException("Must specify " + PARAM_CID + "param.", env));
+        Integer size = DirectiveUtil.getInteger(PARAM_SIZE, params).orElse(10);
+        Integer page = DirectiveUtil.getInteger(PARAM_PAGE, params).orElse(1);
+        String orderBy = DirectiveUtil.getString(PARAM_ORDER_BY, params).orElse(DEFAULT_ORDER_BY);
+        String order = DirectiveUtil.getString(PARAM_ORDER, params).orElse("asc");
 
         QueryWrapper<Article> queryWrapper = new QueryWrapper<Article>()
                 .select(TableField.ARTICLE_FIELD_WITHOUT_BLOB)
-                .orderBy(true, "asc".equalsIgnoreCase(order), orderBy);
+                .eq("article_category_id", categoryId)
+                .orderByAsc("asc".equalsIgnoreCase(order), orderBy);
 
-        List<Article> articleList = articleMapper.selectPage(new Page<>(page, size), queryWrapper).getRecords();
-        DefaultObjectWrapper wrapper = new DefaultObjectWrapperBuilder(Configuration.getVersion()).build();
+        IPage<Article> articleList = articleMapper.selectPage(new Page<>(page, size), queryWrapper);
 
-        try {
-            for (Article article : articleList) {
-                loopVars[0] = wrapper.wrap(article);
-                body.render(env.getOut());
-            }
-        } catch (IOException e) {
-            throw new TemplateException(e, env);
-        }
+        env.setVariable("result", wrapper.wrap(articleList));
+
+        body.render(env.getOut());
     }
 }

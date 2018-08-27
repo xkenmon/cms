@@ -92,7 +92,7 @@ public class ArticleApi {
                 .body(ApiMessage.success(201, uploadRequest.getArticle().getArticleId()));
     }
 
-    @Auth(siteId = "#article.articleSiteId", modules = ModuleNames.CONTENT_MANAGE)
+    @Auth(siteId = "#uploadRequest.article.articleSiteId", modules = ModuleNames.CONTENT_MANAGE)
     @PutMapping
     @ApiOperation(value = "update a article", notes = "更新文章，article的ID字段必须指定，返回更新成功后的文章对象")
     @ApiResponses({
@@ -100,9 +100,12 @@ public class ArticleApi {
             @ApiResponse(code = 500, message = "internal error"),
             @ApiResponse(code = 400, message = "article is invalid")
     })
-    public ApiMessage updateArticle(@RequestBody Article article) throws ApiException {
-        LOGGER.info("update article - id: {}, title: {}", article.getArticleId(), article.getArticleTitle());
-        return ApiMessage.success(articleService.updateArticle(article));
+    public ApiMessage updateArticle(@RequestBody ArticleUploadRequest uploadRequest) throws ApiException {
+        Article article = articleService.updateArticle(uploadRequest);
+        LOGGER.info("update article - id: {}, title: {}"
+                , uploadRequest.getArticle().getArticleId()
+                , uploadRequest.getArticle().getArticleTitle());
+        return ApiMessage.success(article);
     }
 
     @Auth(siteId = "@articleServiceImpl.selectById(#id).articleSiteId", modules = ModuleNames.CONTENT_MANAGE)

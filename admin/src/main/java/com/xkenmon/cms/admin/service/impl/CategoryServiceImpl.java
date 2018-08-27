@@ -137,7 +137,7 @@ public class CategoryServiceImpl implements ICategoryService {
     private boolean isInvalid(Category category) {
         return Strings.isNullOrEmpty(category.getCategoryTitle()) ||
                 Strings.isNullOrEmpty(category.getCategoryType()) ||
-                category.getCategoryId() == null ||
+                category.getCategorySiteId() == null ||
                 category.getCategorySiteId() <= 0;
     }
 }

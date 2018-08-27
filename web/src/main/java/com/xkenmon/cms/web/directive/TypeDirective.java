@@ -2,6 +2,7 @@ package com.xkenmon.cms.web.directive;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.xkenmon.cms.common.constant.AccessStatus;
 import com.xkenmon.cms.dao.entity.Article;
@@ -9,23 +10,23 @@ import com.xkenmon.cms.dao.entity.Category;
 import com.xkenmon.cms.dao.entity.Site;
 import com.xkenmon.cms.dao.mapper.ArticleMapper;
 import com.xkenmon.cms.dao.mapper.CategoryMapper;
+import com.xkenmon.cms.web.annotation.CmsDirective;
 import com.xkenmon.cms.web.directive.util.DirectiveUtil;
 import freemarker.core.Environment;
 import freemarker.template.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * 获取指定类型的栏目或文章,栏目类型和文章类型只能指定一个
  *
  * @author bigmeng
  */
-@Component
+@CmsDirective("cms_type_list")
 public class TypeDirective implements TemplateDirectiveModel {
 
     /**
@@ -67,6 +68,8 @@ public class TypeDirective implements TemplateDirectiveModel {
      */
     private static final String DEFAULT_CATE_SORT = "category_create_time";
 
+    private static final DefaultObjectWrapper wrapper = new DefaultObjectWrapperBuilder(Configuration.getVersion()).build();
+
     private final ArticleMapper articleMapper;
     private final CategoryMapper categoryMapper;
 
@@ -78,71 +81,45 @@ public class TypeDirective implements TemplateDirectiveModel {
 
     @Override
     public void execute(Environment env, Map params, TemplateModel[] loopVars
-            , TemplateDirectiveBody body) throws TemplateException {
-        String cateType = DirectiveUtil.getString(PARAM_CATEGORY_TYPE, params);
-        String articleType = DirectiveUtil.getString(PARAM_ARTICLE_TYPE, params);
-        String orderBy = DirectiveUtil.getString(PARAM_ORDER_BY, params);
-        String order = DirectiveUtil.getString(PARAM_ORDER, params);
-        Integer size = DirectiveUtil.getInteger(PARAM_SIZE, params);
-        Integer page = DirectiveUtil.getInteger(PARAM_PAGE, params);
-        Site site = DirectiveUtil.getSite(env);
+            , TemplateDirectiveBody body) throws TemplateException, IOException {
+        Optional<String> cateType = DirectiveUtil.getString(PARAM_CATEGORY_TYPE, params);
+        Optional<String> articleType = DirectiveUtil.getString(PARAM_ARTICLE_TYPE, params);
+        Optional<String> orderBy = DirectiveUtil.getString(PARAM_ORDER_BY, params);
+        Optional<String> order = DirectiveUtil.getString(PARAM_ORDER, params);
+        Optional<Integer> size = DirectiveUtil.getInteger(PARAM_SIZE, params);
+        Optional<Integer> page = DirectiveUtil.getInteger(PARAM_PAGE, params);
+        Optional<Site> site = DirectiveUtil.getSite(env);
 
-        if (loopVars.length == 0) {
-            throw new TemplateException("必须指定循环变量，详情参看文档", env);
-        }
-
-        if (site == null) {
+        if (!site.isPresent()) {
             throw new TemplateException("site can't found", env);
         }
 
         //异或非运算 有且仅有一个不为null
-        if ((cateType == null) == (articleType == null)) {
+        if ((!cateType.isPresent()) == (!articleType.isPresent())) {
             throw new TemplateException(PARAM_ARTICLE_TYPE + " or " + PARAM_CATEGORY_TYPE + " must be specified one.", env);
         }
 
-        if (size == null) {
-            size = 0;
-        }
-        if (page == null) {
-            page = 0;
-        }
-        if (orderBy == null) {
-            if (cateType != null) {
-                orderBy = DEFAULT_CATE_SORT;
-            }
-            if (articleType != null) {
-                orderBy = DEFAULT_ARTICLE_SORT;
-            }
-        }
-
-        List retList;
-        if (cateType != null) {
+        IPage retList;
+        if (cateType.isPresent()) {
             Wrapper<Category> queryWrapper = new QueryWrapper<Category>()
-                    .eq("category_type", cateType)
-                    .and(w -> w.eq("category_site_id", site.getSiteId()))
-                    .orderBy(true, "asc".equalsIgnoreCase(order), orderBy);
+                    .eq("category_type", cateType.get())
+                    .and(w -> w.eq("category_site_id", site.get().getSiteId()))
+                    .orderBy(true, "asc".equalsIgnoreCase(order.orElse("category_create_time")), orderBy.orElse(DEFAULT_CATE_SORT));
 
-            retList = categoryMapper.selectPage(new Page<>(page, size), queryWrapper).getRecords();
+            retList = categoryMapper.selectPage(new Page<>(page.orElse(1), size.orElse(10)), queryWrapper);
         } else {
             Map<String, Object> map = new HashMap<>(3);
-            map.put("article_type", articleType);
-            map.put("article_site_id", site.getSiteId());
+            map.put("article_type", articleType.get());
+            map.put("article_site_id", site.get().getSiteId());
             map.put("article_status", AccessStatus.ACCESS);
             Wrapper<Article> articleWrapper = new QueryWrapper<Article>()
                     .allEq(map)
-                    .orderBy(true, "asc".equalsIgnoreCase(order), orderBy);
-            retList = articleMapper.selectPage(new Page<>(page, size), articleWrapper).getRecords();
+                    .orderBy(true, "asc".equalsIgnoreCase(order.orElse("asc")), orderBy.orElse(DEFAULT_ARTICLE_SORT));
+            retList = articleMapper.selectPage(new Page<>(page.orElse(1), size.orElse(10)), articleWrapper);
         }
 
-        DefaultObjectWrapper wrapper = new DefaultObjectWrapperBuilder(Configuration.getVersion()).build();
+        env.setVariable("result", wrapper.wrap(retList));
 
-        try {
-            for (Object a : retList) {
-                loopVars[0] = wrapper.wrap(a);
-                body.render(env.getOut());
-            }
-        } catch (IOException e) {
-            throw new TemplateException(e, env);
-        }
+        body.render(env.getOut());
     }
 }

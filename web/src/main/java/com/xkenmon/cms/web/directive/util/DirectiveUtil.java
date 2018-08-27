@@ -1,11 +1,11 @@
 package com.xkenmon.cms.web.directive.util;
 
 import com.xkenmon.cms.dao.entity.Site;
-import com.xkenmon.cms.web.dto.ModelResult;
 import freemarker.core.Environment;
 import freemarker.template.*;
 
 import java.util.Map;
+import java.util.Optional;
 
 
 /**
@@ -26,35 +26,35 @@ public class DirectiveUtil {
         return defaultName;
     }
 
-    public static String getString(String key, Map params) throws TemplateModelException {
+    public static Optional<String> getString(String key, Map params) throws TemplateModelException {
         TemplateModel model = (TemplateModel) params.get(key);
         if (model == null) {
-            return null;
+            return Optional.empty();
         }
         if (model instanceof TemplateScalarModel) {
-            return ((TemplateScalarModel) model).getAsString();
+            return Optional.ofNullable(((TemplateScalarModel) model).getAsString());
         }
         if (model instanceof TemplateNumberModel) {
-            return ((TemplateNumberModel) model).getAsNumber().toString();
+            return Optional.ofNullable(((TemplateNumberModel) model).getAsNumber().toString());
         }
         throw new TemplateModelException(key + " must is String or Number");
     }
 
-    public static Integer getInteger(String key, Map params) throws TemplateModelException {
+    public static Optional<Integer> getInteger(String key, Map params) throws TemplateModelException {
         TemplateModel model = (TemplateModel) params.get(key);
         if (model == null) {
-            return null;
+            return Optional.empty();
         }
         if (model instanceof TemplateNumberModel) {
-            return ((TemplateNumberModel) model).getAsNumber().intValue();
+            return Optional.of(((TemplateNumberModel) model).getAsNumber().intValue());
         }
         if (model instanceof TemplateScalarModel) {
             String s = ((TemplateScalarModel) model).getAsString();
             if (s == null || s.equals("")) {
-                return null;
+                return Optional.empty();
             }
             try {
-                return Integer.parseInt(s);
+                return Optional.of(Integer.parseInt(s));
             } catch (NumberFormatException e) {
                 throw new TemplateModelException(s + " must is Number");
             }
@@ -62,30 +62,30 @@ public class DirectiveUtil {
         throw new TemplateModelException(key + "must is Number");
     }
 
-    public static Boolean getBoolean(String key, Map param) throws TemplateModelException {
+    public static Optional<Boolean> getBoolean(String key, Map param) throws TemplateModelException {
         TemplateModel model = (TemplateModel) param.get(key);
         if (model == null) {
-            return null;
+            return Optional.empty();
         }
         if (model instanceof TemplateBooleanModel) {
-            return ((TemplateBooleanModel) model).getAsBoolean();
+            return Optional.of(((TemplateBooleanModel) model).getAsBoolean());
         }
         if (model instanceof TemplateScalarModel) {
             String s = ((TemplateScalarModel) model).getAsString();
             if (!s.equals("true")) {
                 if (s.equals("false")) {
-                    return false;
+                    return Optional.of(Boolean.FALSE);
                 } else {
                     throw new TemplateModelException(key + "Must is Boolean");
                 }
             } else {
-                return true;
+                return Optional.of(Boolean.TRUE);
             }
         }
-        return false;
+        throw new TemplateModelException(key + " must is bool type");
     }
 
-    public static Site getSite(Environment env) throws TemplateModelException {
-        return (Site) ((ModelResult) wrapper.unwrap(env.getVariable("result"))).get("site");
+    public static Optional<Site> getSite(Environment env) throws TemplateModelException {
+        return Optional.of((Site) wrapper.unwrap(env.getVariable("site")));
     }
 }

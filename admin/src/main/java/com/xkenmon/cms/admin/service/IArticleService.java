@@ -48,7 +48,7 @@ public interface IArticleService {
      * @return 更新成功的文章
      * @throws ApiException 交由{@link com.xkenmon.cms.admin.api.ControllerExceptionHandler} 处理的http错误信息
      */
-    Article updateArticle(Article article) throws ApiException;
+    Article updateArticle(ArticleUploadRequest article) throws ApiException;
 
     /**
      * 删除文章
